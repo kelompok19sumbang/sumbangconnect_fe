@@ -1,0 +1,11 @@
+.scroll-reveal {
+  margin: 0;
+}
+.scroll-reveal-text {
+  /* Hapus font-size dan line-height bawaan agar ngikutin Tailwind */
+  font-weight: 400;
+  color: inherit;
+}
+.word {
+  display: inline-block;
+}

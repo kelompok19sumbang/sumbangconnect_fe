@@ -12,6 +12,15 @@ export interface UmkmItem {
   };
   sejarah_umkm?: any; // Format Blocks dari Strapi
   katalog_produk?: ProdukItem[]; // Menyambungkan komponen produk
+  kategori?: string;
+  instagram?: string;
+  tiktok?: string;
+  facebook?: string;
+  website?: string;
+  email?: string;
+  bukalapak?: string;
+  tokopedia?: string;
+  shopee?: string;
 }
 
 export interface ProfilDesaItem {

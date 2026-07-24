@@ -1,6 +1,7 @@
 // src/app/berita/page.tsx
 import { getBerita } from '@/lib/api';
 import Link from 'next/link';
+import BlurText from '@/components/BlurText';
 
 export default async function BeritaPage() {
   const beritaData = await getBerita();
@@ -24,9 +25,15 @@ export default async function BeritaPage() {
         <p className="text-terracotta font-bold uppercase tracking-widest text-sm mb-3">
           Kabar Terbaru
         </p>
-        <h1 className="text-4xl md:text-5xl font-bold text-dark font-serif mb-6">
-          Berita Kelurahan
-        </h1>
+        <div className="mb-6 flex justify-center">
+          <BlurText 
+            text="Berita Kelurahan Sumbang" 
+            delay={100} 
+            animateBy="words" 
+            direction="bottom" 
+            className="text-4xl md:text-5xl font-bold text-dark font-serif" 
+          />
+        </div>
         <p className="text-dark/70 max-w-2xl mx-auto text-lg leading-relaxed">
           Ikuti perkembangan terkini, pengumuman resmi, dan berbagai kegiatan kemasyarakatan di lingkungan Kelurahan Sumbang.
         </p>

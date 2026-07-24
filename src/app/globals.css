@@ -1,10 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-forest: #093720;
-  --color-cream: #F8F5EE;
-  --color-terracotta: #F27C53;
-  --color-dark: #1A2721;
+  /* Palet Warna Baru */
+  --color-blue-light: #7AD6FD;
+  --color-blue-cyan: #00BBFA;
+  --color-blue-primary: #0190FD;
+  --color-navy: #00183E;
+  --color-accent: #FFC54A;
+
+  /* Warna Netral Latar Belakang & Teks */
+  --color-cream: #F8FAFC; /* Dibuat lebih kebiruan/putih bersih agar cocok dengan tema tech */
+  --color-dark: #00183E;  /* Disamakan dengan Navy agar teks gelap selaras */
+
   /* Font Apple San Francisco */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }

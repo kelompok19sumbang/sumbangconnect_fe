@@ -2,7 +2,8 @@
 import { UmkmItem } from '@/types';
 
 export async function getUmkm(): Promise<UmkmItem[]> {
-  const res = await fetch('http://127.0.0.1:1337/api/umkms?populate=*', {
+  // Ditambahkan limit 1000 agar data UMKM tidak terpotong
+  const res = await fetch('http://127.0.0.1:1337/api/umkms?populate=*&pagination[limit]=1000', {
     cache: 'no-store'
   });
   
@@ -12,10 +13,7 @@ export async function getUmkm(): Promise<UmkmItem[]> {
   return json.data;
 }
 
-// Tambahkan fungsi baru ini di bawah
 export async function getUmkmById(documentId: string): Promise<UmkmItem> {
-  // Kita ubah penulisan populate menggunakan "dot notation" (koma dan titik)
-  // Cara ini jauh lebih aman dari error karakter URL
   const url = `http://127.0.0.1:1337/api/umkms/${documentId}?populate=foto_produk,katalog_produk.foto_produk`;
   
   const res = await fetch(url, {
@@ -23,7 +21,6 @@ export async function getUmkmById(documentId: string): Promise<UmkmItem> {
   });
   
   if (!res.ok) {
-    // Tambahan: Agar kalau error lagi, kita tahu pesan aslinya dari Strapi apa
     const errorData = await res.text();
     console.error("DEBUG STRAPI ERROR:", errorData);
     throw new Error(`Gagal mengambil detail UMKM (Status: ${res.status})`);
@@ -40,17 +37,14 @@ export async function getProfilDesa() {
   
   if (!res.ok) {
     console.error("Gagal mengambil Profil Desa:", await res.text());
-    return null; // Mengembalikan null jika belum ada data agar web tidak crash
+    return null; 
   }
   
   const json = await res.json();
   return json.data;
 }
 
-// src/lib/api.ts
-
 export async function getInfografis() {
-  // Arahkan ke endpoint statistik yang baru kita buat
   const res = await fetch('http://127.0.0.1:1337/api/statistik', {
     cache: 'no-store'
   });
@@ -64,11 +58,9 @@ export async function getInfografis() {
   return json.data;
 }
 
-// src/lib/api.ts
-
 export async function getPengaturanGlobal() {
   const res = await fetch('http://127.0.0.1:1337/api/pengaturan-global', {
-    cache: 'no-store' // Bisa diganti 'force-cache' nanti kalau web sudah rilis agar lebih cepat
+    cache: 'no-store' 
   });
   
   if (!res.ok) {
@@ -79,8 +71,6 @@ export async function getPengaturanGlobal() {
   const json = await res.json();
   return json.data;
 }
-
-// src/lib/api.ts
 
 export async function getBeranda() {
   const res = await fetch('http://127.0.0.1:1337/api/beranda?populate=*', {
@@ -96,10 +86,10 @@ export async function getBeranda() {
   return json.data;
 }
 
-// src/lib/api.ts
+// INI YANG PALING PENTING UNTUK MAPS:
 export async function getFasilitas() {
-  // Ubah 'fasilitas' menjadi 'data-fasilitas' di link ini:
-  const res = await fetch('http://127.0.0.1:1337/api/data-fasilitas?populate=*', {
+  // Ditambahkan limit 1000 agar semua pin fasilitas di peta muncul
+  const res = await fetch('http://127.0.0.1:1337/api/data-fasilitas?populate=*&pagination[limit]=1000', {
     cache: 'no-store' 
   });
   
@@ -121,10 +111,9 @@ export async function getFasilitasById(id: string) {
   return json.data;
 }
 
-// src/lib/api.ts
-
 export async function getBerita() {
-  const res = await fetch('http://127.0.0.1:1337/api/data-berita?populate=*&sort=tanggal_publikasi:desc', {
+  // Ditambahkan limit 1000 agar semua berita ketarik
+  const res = await fetch('http://127.0.0.1:1337/api/data-berita?populate=*&sort=tanggal_publikasi:desc&pagination[limit]=1000', {
     cache: 'no-store'
   });
   
@@ -137,7 +126,6 @@ export async function getBerita() {
   return json.data;
 }
 
-// Tarik 1 Berita spesifik berdasarkan Slug
 export async function getBeritaBySlug(slug: string) {
   const res = await fetch(`http://127.0.0.1:1337/api/data-berita?filters[slug][$eq]=${slug}&populate=*`, {
     cache: 'no-store'
@@ -149,18 +137,32 @@ export async function getBeritaBySlug(slug: string) {
   }
   
   const json = await res.json();
-  // Karena fitur 'filters' mengembalikan data dalam bentuk Array, kita ambil index ke-[0]
   return json.data.length > 0 ? json.data[0] : null; 
 }
 
-// Tarik data Layanan Publik
 export async function getLayanan() {
-  const res = await fetch('http://127.0.0.1:1337/api/data-layanan?populate=*', {
+  // Ditambahkan limit 1000 agar semua daftar layanan muncul di accordion
+  const res = await fetch('http://127.0.0.1:1337/api/data-layanan?populate=*&pagination[limit]=1000', {
     cache: 'no-store'
   });
   
   if (!res.ok) {
     console.error("Gagal mengambil data Layanan");
+    return [];
+  }
+  
+  const json = await res.json();
+  return json.data;
+}
+
+export async function getGaleri() {
+  // Ditambahkan limit 1000 agar arsip galeri tidak terpotong
+  const res = await fetch('http://127.0.0.1:1337/api/data-galeri?populate=*&pagination[limit]=1000', {
+    cache: 'no-store'
+  });
+  
+  if (!res.ok) {
+    console.error("Gagal mengambil data Galeri");
     return [];
   }
   

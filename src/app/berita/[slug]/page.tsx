@@ -17,7 +17,7 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
   }
 
   const thumbnailUrl = artikel.thumbnail?.url 
-    ? `http://127.0.0.1:1337${artikel.thumbnail.url}`
+    ? `http://http://103.82.92.95${artikel.thumbnail.url}`
     : 'https://via.placeholder.com/1200x600?text=SumbangConnect';
 
   const formatTanggal = (tanggal: string) => {

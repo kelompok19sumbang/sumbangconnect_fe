@@ -11,7 +11,7 @@ export default async function Home() {
   const totalUmkm = umkmData ? umkmData.length : 0;
 
   const fotoLurahUrl = beranda?.foto_lurah?.url 
-    ? `http://127.0.0.1:1337${beranda.foto_lurah.url}`
+    ? `http://http://103.82.92.95${beranda.foto_lurah.url}`
     : 'https://via.placeholder.com/600x800?text=Foto+Lurah';
 
   return (

@@ -9,9 +9,10 @@ export default async function GaleriPage() {
   // 1. BATASI DATA: Ambil maksimal 30 foto saja untuk memutar kubah
   const latestPhotos = galeriData.slice(0, 30);
 
+  // ✅ IP VPS DIHAPUS
   const mappedImages = latestPhotos.map((item: any) => ({
     src: item.foto?.url 
-      ? `http://103.82.92.95${item.foto.url}` 
+      ? item.foto.url 
       : 'https://via.placeholder.com/400',
     alt: item.judul_foto || 'Dokumentasi Kelurahan Sumbang'
   }));

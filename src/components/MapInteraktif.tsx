@@ -67,9 +67,6 @@ export default function MapInteraktif({ dataFasilitas }: { dataFasilitas: any[] 
     item.kategori && activeCategories.includes(item.kategori)
   );
 
-  // STATE isMounted DIHAPUS agar tidak bentrok dengan Strict Mode React 18
-  // (Aman karena komponen dibungkus MapWrapper dengan ssr: false)
-
   return (
     <div className="flex flex-col lg:flex-row gap-6 bg-white p-4 rounded-3xl shadow-xl border border-navy/10 overflow-hidden">
       
@@ -126,8 +123,9 @@ export default function MapInteraktif({ dataFasilitas }: { dataFasilitas: any[] 
             // Pengaman ekstra jika ada input huruf yang berubah jadi NaN (Not a Number)
             if (!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
             
+            // ✅ IP VPS DIHAPUS, CUKUP PATH RELATIF
             const fotoUrl = item.foto_fasilitas?.[0]?.url 
-              ? `http://103.82.92.95${item.foto_fasilitas[0].url}`
+              ? item.foto_fasilitas[0].url
               : 'https://via.placeholder.com/300x150?text=No+Image';
 
             return (

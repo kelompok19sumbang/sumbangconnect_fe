@@ -10,8 +10,9 @@ export default async function Home() {
 
   const totalUmkm = umkmData ? umkmData.length : 0;
 
+  // ✅ IP VPS DIHAPUS
   const fotoLurahUrl = beranda?.foto_lurah?.url 
-    ? `http://103.82.92.95${beranda.foto_lurah.url}`
+    ? beranda.foto_lurah.url
     : 'https://via.placeholder.com/600x800?text=Foto+Lurah';
 
   return (

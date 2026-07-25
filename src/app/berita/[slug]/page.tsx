@@ -1,7 +1,7 @@
 // src/app/berita/[slug]/page.tsx
 import { getBeritaBySlug } from '@/lib/api';
 import Link from 'next/link';
-import ImageSlider from '@/components/ImageSlider'; // <-- Import ImageSlider andalanmu!
+import ImageSlider from '@/components/ImageSlider'; 
 
 export default async function BeritaDetail({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
@@ -16,8 +16,9 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
     );
   }
 
+  // ✅ IP VPS DIHAPUS, CUKUP PANGGIL RELATIF PATH
   const thumbnailUrl = artikel.thumbnail?.url 
-    ? `http://103.82.92.95${artikel.thumbnail.url}`
+    ? artikel.thumbnail.url 
     : 'https://via.placeholder.com/1200x600?text=SumbangConnect';
 
   const formatTanggal = (tanggal: string) => {

@@ -26,8 +26,10 @@ export default async function ArsipGaleriPage() {
         {galeriData && galeriData.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {galeriData.map((item: any, index: number) => {
+              
+              // ✅ IP VPS DIHAPUS
               const imgUrl = item.foto?.url 
-                ? `http://103.82.92.95${item.foto.url}` 
+                ? item.foto.url 
                 : 'https://via.placeholder.com/600';
                 
               return (

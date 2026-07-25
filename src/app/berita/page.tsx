@@ -44,10 +44,10 @@ export default async function BeritaPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {beritaData.length > 0 ? (
             beritaData.map((item: any) => {
-              // Siapkan URL gambar (Cukup panggil path relatif dari Strapi)
-              const thumbnailUrl = item.thumbnail?.url 
-                ? item.thumbnail.url 
-                : 'https://via.placeholder.com/600x400?text=SumbangConnect';
+              // Siapkan URL gambar (Replace /uploads jadi /api-images)
+const thumbnailUrl = item.thumbnail?.url 
+  ? item.thumbnail.url.replace('/uploads', '/api-images')
+  : 'https://via.placeholder.com/600x400?text=SumbangConnect';
 
               return (
                 <Link 

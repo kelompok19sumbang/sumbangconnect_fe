@@ -16,10 +16,10 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
     );
   }
 
-  // ✅ IP VPS DIHAPUS, CUKUP PANGGIL RELATIF PATH
-  const thumbnailUrl = artikel.thumbnail?.url 
-    ? artikel.thumbnail.url 
-    : 'https://via.placeholder.com/1200x600?text=SumbangConnect';
+// Lakukan hal yang sama di sini
+const thumbnailUrl = artikel.thumbnail?.url 
+  ? artikel.thumbnail.url.replace('/uploads', '/api-images')
+  : 'https://via.placeholder.com/1200x600?text=SumbangConnect';
 
   const formatTanggal = (tanggal: string) => {
     if (!tanggal) return '';

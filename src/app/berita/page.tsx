@@ -46,7 +46,7 @@ export default async function BeritaPage() {
             beritaData.map((item: any) => {
               // Siapkan URL gambar
               const thumbnailUrl = item.thumbnail?.url 
-                ? `http://http://103.82.92.95${item.thumbnail.url}`
+                ? `http://103.82.92.95${item.thumbnail.url}`
                 : 'https://via.placeholder.com/600x400?text=SumbangConnect';
 
               return (

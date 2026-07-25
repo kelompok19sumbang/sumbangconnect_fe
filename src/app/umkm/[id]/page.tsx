@@ -8,7 +8,7 @@ export default async function UmkmDetail({ params }: { params: Promise<{ id: str
   const item = await getUmkmById(resolvedParams.id);
 
   const fotoUrl = item.foto_produk?.url 
-    ? `http://http://103.82.92.95${item.foto_produk.url}` 
+    ? `http://103.82.92.95${item.foto_produk.url}` 
     : 'https://via.placeholder.com/1200x600?text=No+Image';
 
   const renderBlocks = (blocks: any) => {

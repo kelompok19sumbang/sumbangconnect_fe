@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function UmkmCard({ item }: { item: UmkmItem }) {
   const fotoUrl = item.foto_produk?.url 
-    ? `http://http://103.82.92.95${item.foto_produk.url}` 
+    ? `http://103.82.92.95${item.foto_produk.url}` 
     : 'https://via.placeholder.com/600x800?text=No+Image';
 
   return (

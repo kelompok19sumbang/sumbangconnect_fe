@@ -11,7 +11,7 @@ export default async function GaleriPage() {
 
   const mappedImages = latestPhotos.map((item: any) => ({
     src: item.foto?.url 
-      ? `http://http://103.82.92.95${item.foto.url}` 
+      ? `http://103.82.92.95${item.foto.url}` 
       : 'https://via.placeholder.com/400',
     alt: item.judul_foto || 'Dokumentasi Kelurahan Sumbang'
   }));

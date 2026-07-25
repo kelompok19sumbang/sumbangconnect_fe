@@ -127,7 +127,7 @@ export default function MapInteraktif({ dataFasilitas }: { dataFasilitas: any[] 
             if (!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
             
             const fotoUrl = item.foto_fasilitas?.[0]?.url 
-              ? `http://http://103.82.92.95${item.foto_fasilitas[0].url}`
+              ? `http://103.82.92.95${item.foto_fasilitas[0].url}`
               : 'https://via.placeholder.com/300x150?text=No+Image';
 
             return (

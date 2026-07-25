@@ -3,7 +3,7 @@ import { UmkmItem } from '@/types';
 
 export async function getUmkm(): Promise<UmkmItem[]> {
   // Ditambahkan limit 1000 agar data UMKM tidak terpotong
-  const res = await fetch('http://http://103.82.92.95/api/umkms?populate=*&pagination[limit]=1000', {
+  const res = await fetch('http://103.82.92.95/api/umkms?populate=*&pagination[limit]=1000', {
     cache: 'no-store'
   });
   
@@ -14,7 +14,7 @@ export async function getUmkm(): Promise<UmkmItem[]> {
 }
 
 export async function getUmkmById(documentId: string): Promise<UmkmItem> {
-  const url = `http://http://103.82.92.95/api/umkms/${documentId}?populate=foto_produk,katalog_produk.foto_produk`;
+  const url = `http://103.82.92.95/api/umkms/${documentId}?populate=foto_produk,katalog_produk.foto_produk`;
   
   const res = await fetch(url, {
     cache: 'no-store'
@@ -31,7 +31,7 @@ export async function getUmkmById(documentId: string): Promise<UmkmItem> {
 }
 
 export async function getProfilDesa() {
-  const res = await fetch('http://http://103.82.92.95/api/profil-desa?populate=*', {
+  const res = await fetch('http://103.82.92.95/api/profil-desa?populate=*', {
     cache: 'no-store'
   });
   
@@ -45,7 +45,7 @@ export async function getProfilDesa() {
 }
 
 export async function getInfografis() {
-  const res = await fetch('http://http://103.82.92.95/api/statistik', {
+  const res = await fetch('http://103.82.92.95/api/statistik', {
     cache: 'no-store'
   });
   
@@ -59,7 +59,7 @@ export async function getInfografis() {
 }
 
 export async function getPengaturanGlobal() {
-  const res = await fetch('http://http://103.82.92.95/api/pengaturan-global', {
+  const res = await fetch('http://103.82.92.95/api/pengaturan-global', {
     cache: 'no-store' 
   });
   
@@ -73,7 +73,7 @@ export async function getPengaturanGlobal() {
 }
 
 export async function getBeranda() {
-  const res = await fetch('http://http://103.82.92.95/api/beranda?populate=*', {
+  const res = await fetch('http://103.82.92.95/api/beranda?populate=*', {
     cache: 'no-store'
   });
   
@@ -89,7 +89,7 @@ export async function getBeranda() {
 // INI YANG PALING PENTING UNTUK MAPS:
 export async function getFasilitas() {
   // Ditambahkan limit 1000 agar semua pin fasilitas di peta muncul
-  const res = await fetch('http://http://103.82.92.95/api/data-fasilitas?populate=*&pagination[limit]=1000', {
+  const res = await fetch('http://103.82.92.95/api/data-fasilitas?populate=*&pagination[limit]=1000', {
     cache: 'no-store' 
   });
   
@@ -103,7 +103,7 @@ export async function getFasilitas() {
 }
 
 export async function getFasilitasById(id: string) {
-  const res = await fetch(`http://http://103.82.92.95/api/data-fasilitas/${id}?populate=*`, {
+  const res = await fetch(`http://103.82.92.95/api/data-fasilitas/${id}?populate=*`, {
     cache: 'no-store'
   });
   if (!res.ok) return null;
@@ -113,7 +113,7 @@ export async function getFasilitasById(id: string) {
 
 export async function getBerita() {
   // Ditambahkan limit 1000 agar semua berita ketarik
-  const res = await fetch('http://http://103.82.92.95/api/data-berita?populate=*&sort=tanggal_publikasi:desc&pagination[limit]=1000', {
+  const res = await fetch('http://103.82.92.95/api/data-berita?populate=*&sort=tanggal_publikasi:desc&pagination[limit]=1000', {
     cache: 'no-store'
   });
   
@@ -127,7 +127,7 @@ export async function getBerita() {
 }
 
 export async function getBeritaBySlug(slug: string) {
-  const res = await fetch(`http://http://103.82.92.95/api/data-berita?filters[slug][$eq]=${slug}&populate=*`, {
+  const res = await fetch(`http://103.82.92.95/api/data-berita?filters[slug][$eq]=${slug}&populate=*`, {
     cache: 'no-store'
   });
   
@@ -142,7 +142,7 @@ export async function getBeritaBySlug(slug: string) {
 
 export async function getLayanan() {
   // Ditambahkan limit 1000 agar semua daftar layanan muncul di accordion
-  const res = await fetch('http://http://103.82.92.95/api/data-layanan?populate=*&pagination[limit]=1000', {
+  const res = await fetch('http://103.82.92.95/api/data-layanan?populate=*&pagination[limit]=1000', {
     cache: 'no-store'
   });
   
@@ -157,7 +157,7 @@ export async function getLayanan() {
 
 export async function getGaleri() {
   // Ditambahkan limit 1000 agar arsip galeri tidak terpotong
-  const res = await fetch('http://http://103.82.92.95/api/data-galeri?populate=*&pagination[limit]=1000', {
+  const res = await fetch('http://103.82.92.95/api/data-galeri?populate=*&pagination[limit]=1000', {
     cache: 'no-store'
   });
   

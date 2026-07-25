@@ -58,4 +58,4 @@ export default function UmkmCard({ item }: { item: UmkmItem }) {
       </div>
     </div>
   );
-}
+} 

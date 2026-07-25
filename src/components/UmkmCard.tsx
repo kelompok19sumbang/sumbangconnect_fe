@@ -3,8 +3,9 @@ import { UmkmItem } from '@/types';
 import Link from 'next/link';
 
 export default function UmkmCard({ item }: { item: UmkmItem }) {
+  // Hapus IP VPS, cukup panggil item.foto_produk.url (path relatif)
   const fotoUrl = item.foto_produk?.url 
-    ? `http://103.82.92.95${item.foto_produk.url}` 
+    ? item.foto_produk.url 
     : 'https://via.placeholder.com/600x800?text=No+Image';
 
   return (

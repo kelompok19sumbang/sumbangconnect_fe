@@ -43,7 +43,7 @@ export default function ImageSlider({ images, altPrefix }: { images: any[], altP
           onClick={() => setIsModalOpen(true)}
         >
           <img
-            src={`http://103.82.92.95${images[activeIdx].url}`}
+            src={images[activeIdx].url}
             alt={`${altPrefix} - Utama`}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
@@ -71,7 +71,7 @@ export default function ImageSlider({ images, altPrefix }: { images: any[], altP
                 }`}
               >
                 <img
-                  src={`http://103.82.92.95${foto.url}`}
+                  src={foto.url}
                   alt={`Thumbnail ${idx + 1}`}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
@@ -105,7 +105,7 @@ export default function ImageSlider({ images, altPrefix }: { images: any[], altP
           )}
 
           <img 
-            src={`http://103.82.92.95${images[activeIdx].url}`}
+            src={images[activeIdx].url}
             alt={`${altPrefix} - Enlarge`}
             className="max-w-full max-h-[90vh] object-contain rounded-lg cursor-default"
             onClick={(e) => e.stopPropagation()} 

@@ -10,13 +10,13 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
+  // Menu "Profil Desa" sudah dihapus dari daftar ini
   const navLinks = [
     { name: 'Beranda', href: '/' },
     { name: 'Berita', href: '/berita' },
     { name: 'Katalog UMKM', href: '/umkm' },
-    { name: 'Profil Desa', href: '/profil' },
     { name: 'Infografis', href: '/infografis' },
-    { name: 'Fasilitas & Kesehatan', href: '/fasilitas' },
+    { name: 'Fasilitas & Peta Potensi', href: '/fasilitas' },
     { name: 'Layanan Publik', href: '/layanan' },
     { name: 'Galeri Desa', href: '/galeri' },
   ];
@@ -56,7 +56,7 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <Link href="/" className="bg-accent text-navy px-5 py-2.5 ml-2 rounded-full text-[13px] xl:text-sm font-bold hover:bg-white hover:text-navy transition-colors whitespace-nowrap shadow-sm">
+            <Link href="/hubungi-kami" className="bg-accent text-navy px-5 py-2.5 ml-2 rounded-full text-[13px] xl:text-sm font-bold hover:bg-white hover:text-navy transition-colors whitespace-nowrap shadow-sm">
               Hubungi Kami
             </Link>
           </div>

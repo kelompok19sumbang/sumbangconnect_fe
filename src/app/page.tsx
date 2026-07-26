@@ -1,55 +1,95 @@
 // src/app/page.tsx
 import Link from 'next/link';
-import { getBeranda, getUmkm } from '@/lib/api'; 
+import { getBeranda, getUmkm, getProfilDesa } from '@/lib/api'; 
 import BlurText from '@/components/BlurText';
 import CurvedLoop from '@/components/CurvedLoop';
+import ScrollReveal from '@/components/ScrollReveal';
+import ImageSlider from '@/components/ImageSlider';
 
 export default async function Home() {
-  const beranda = await getBeranda();
-  const umkmData = await getUmkm(); 
+  // Fetch semua data secara paralel agar loading lebih cepat
+  const [beranda, umkmData, profilData] = await Promise.all([
+    getBeranda(),
+    getUmkm(),
+    getProfilDesa()
+  ]);
 
   const totalUmkm = umkmData ? umkmData.length : 0;
-
-  // ✅ IP VPS DIHAPUS
   const fotoLurahUrl = beranda?.foto_lurah?.url 
     ? beranda.foto_lurah.url
     : 'https://via.placeholder.com/600x800?text=Foto+Lurah';
 
+  const strukturImages = profilData?.foto_struktur_organisasi ? [profilData.foto_struktur_organisasi] : [];
+
+  // Fungsi khusus merender teks panjang dengan animasi ScrollReveal dari halaman profil
+  const renderScrollRevealContent = (content: any, fallbackText: string, rotation: number) => {
+    if (Array.isArray(content) && content.length > 0) {
+      return content.map((block, index) => {
+        if (block.type === 'paragraph') {
+          const text = block.children?.map((child: any) => child.text).join('');
+          return (
+            <div key={index} className="mb-8">
+              <ScrollReveal 
+                baseOpacity={0} 
+                enableBlur={true} 
+                baseRotation={rotation} 
+                blurStrength={15} 
+                wordAnimationEnd="bottom 70%" 
+                textClassName="text-navy/80 text-lg md:text-xl leading-loose font-serif"
+              >
+                {text}
+              </ScrollReveal>
+            </div>
+          );
+        }
+        return null;
+      });
+    } else {
+      const textToRender = (typeof content === 'string' && content.trim() !== '') ? content : fallbackText;
+      return (
+        <ScrollReveal 
+          baseOpacity={0} 
+          enableBlur={true} 
+          baseRotation={rotation} 
+          blurStrength={15} 
+          wordAnimationEnd="bottom 70%" 
+          textClassName="text-navy/80 text-lg md:text-xl leading-loose font-serif"
+        >
+          {textToRender}
+        </ScrollReveal>
+      );
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-cream font-sans">
+    <main className="min-h-screen bg-cream font-sans pb-24">
       
-      {/* ================= HERO SECTION (AESTHETIC SUPERGRAFIS) ================= */}
+      {/* ================= HERO SECTION ================= */}
       <div className="bg-gradient-to-br from-navy via-blue-primary to-blue-cyan text-white rounded-b-[3rem] md:rounded-b-[5rem] pt-12 pb-32 px-6 lg:px-8 relative overflow-hidden shadow-2xl z-30">
         
         {/* Tekstur Halus Cubes & Glow */}
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none z-0"></div>
         <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-blue-light/20 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/3 pointer-events-none z-0"></div>
         
-        {/* ================= MOTIF SUPERGRAFIS AESTHETIC (PURE WHITE) ================= */}
-        {/* Garis Flowing Lebar (Mengalir dari Kiri ke Kanan) */}
+        {/* Supergrafis Aesthetic */}
         <svg className="absolute inset-0 w-full h-full text-white/15 pointer-events-none z-0" viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
           <path d="M-100,300 C300,100 500,600 1000,300 C1300,150 1500,400 1600,450" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
           <path d="M-50,330 C320,140 480,630 1020,330" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
-          
-          {/* Ornamen Titik Estetik (Kanan Tengah) */}
           <circle cx="1150" cy="200" r="6" fill="currentColor" />
           <circle cx="1175" cy="180" r="3.5" fill="currentColor" opacity="0.7" />
           <circle cx="1195" cy="210" r="2" fill="currentColor" opacity="0.5" />
           <circle cx="1220" cy="190" r="1.5" fill="currentColor" opacity="0.3" />
         </svg>
 
-        {/* Motif Abstrak Kiri Bawah (Di belakang tombol) */}
         <svg className="absolute bottom-[-10%] left-[-5%] w-[30rem] h-[30rem] text-white/20 pointer-events-none z-0" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M50,400 C100,250 250,150 400,200" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
           <circle cx="350" cy="150" r="5" fill="currentColor" />
         </svg>
 
-        {/* Motif Melingkar Kanan Atas (Di Belakang Gambar) */}
         <svg className="absolute top-10 right-0 w-[40rem] h-[40rem] text-white/10 pointer-events-none z-0 rotate-12" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M450,-50 C250,100 150,400 500,500" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
           <path d="M480,-20 C290,120 190,400 520,480" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
-        {/* ============================================================================== */}
 
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10 mt-4">
           <div className="text-center lg:text-left animate-fade-up">
@@ -68,14 +108,13 @@ export default async function Home() {
               <Link href="/umkm" className="bg-accent text-navy px-8 py-4 rounded-full font-bold hover:bg-white transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 w-full sm:w-auto text-center">
                 Jelajahi UMKM
               </Link>
-              <Link href="/profil" className="text-white px-8 py-4 rounded-full font-medium hover:bg-white/10 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center">
-                Profil Desa <span>→</span>
+              <Link href="#profil-desa" className="text-white px-8 py-4 rounded-full font-medium hover:bg-white/10 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center">
+                Profil Desa <span className="animate-bounce">↓</span>
               </Link>
             </div>
           </div>
 
           <div className="hidden lg:flex justify-center relative animate-fade-up" style={{ animationDelay: '0.2s' }}>
-            {/* Bingkai Hero disesuaikan jadi aspect ratio responsif */}
             <div className="relative w-full max-w-[380px] aspect-[3/4] rounded-t-[10rem] rounded-b-[4rem] overflow-hidden border-8 border-white/10 shadow-2xl shadow-navy/50">
               <img 
                 src="https://images.pexels.com/photos/209266/pexels-photo-209266.jpeg?auto=compress&cs=tinysrgb&w=800" 
@@ -107,9 +146,7 @@ export default async function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           <div className="lg:col-span-5 relative flex justify-center">
-            {/* Bingkai foto Lurah diubah menggunakan aspect-[4/5] dan max-width agar tidak melebar */}
             <div className="relative w-full max-w-[380px] aspect-[4/5] rounded-t-[150px] rounded-b-3xl overflow-hidden shadow-2xl border-4 border-white bg-gray-100">
-              {/* Tambahkan object-top di sini agar foto berfokus ke bagian kepala/wajah */}
               <img 
                 src={fotoLurahUrl} 
                 alt={beranda?.nama_lurah || 'Foto Lurah'} 
@@ -159,6 +196,150 @@ export default async function Home() {
               </div>
               <h3 className="text-2xl font-bold text-navy mb-4">Misi</h3>
               <p className="text-navy/70 leading-relaxed whitespace-pre-line">{beranda?.misi || 'Teks misi belum tersedia.'}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= SECTION: PROFIL DESA (SEJARAH, GEOGRAFI, DEMOGRAFI) ================= */}
+      <section id="profil-desa" className="py-32 px-6 lg:px-8 bg-cream">
+        <div className="max-w-4xl mx-auto space-y-32">
+          
+          {/* SEJARAH */}
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center gap-4 mb-10 w-full">
+              <div className="flex-1 h-px bg-navy/10 hidden sm:block"></div>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-navy px-4">Jejak Langkah</h2>
+              <div className="flex-1 h-px bg-navy/10 hidden sm:block"></div>
+            </div>
+            <div className="text-left">
+              {renderScrollRevealContent(
+                profilData?.sejarah_desa, 
+                "Data Sejarah belum ditambahkan di sistem.", 
+                2 
+              )}
+            </div>
+          </div>
+
+          {/* GEOGRAFI */}
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center gap-4 mb-10 w-full">
+              <div className="flex-1 h-px bg-navy/10 hidden sm:block"></div>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-navy px-4">Kondisi Geografis</h2>
+              <div className="flex-1 h-px bg-navy/10 hidden sm:block"></div>
+            </div>
+            <div className="text-left">
+              {renderScrollRevealContent(
+                profilData?.geografi, 
+                "Secara topografi, Kelurahan Sumbang terletak di dataran rendah yang strategis, menjadikannya salah satu urat nadi aktivitas masyarakat perkotaan. Wilayah ini berbatasan langsung dengan area pusat perbelanjaan, fasilitas kesehatan tingkat daerah, dan dilewati oleh jalur penghubung antar kecamatan. Iklim tropis dengan curah hujan menengah membuat lahan di sekitar kelurahan ini tetap asri dan mendukung program penghijauan lorong kota yang digagas oleh warga.", 
+                -2 
+              )}
+            </div>
+          </div>
+
+          {/* DEMOGRAFI */}
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center gap-4 mb-10 w-full">
+              <div className="flex-1 h-px bg-navy/10 hidden sm:block"></div>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-navy px-4">Demografi Warga</h2>
+              <div className="flex-1 h-px bg-navy/10 hidden sm:block"></div>
+            </div>
+            <div className="text-left">
+              {renderScrollRevealContent(
+                profilData?.demografi, 
+                "Masyarakat Kelurahan Sumbang adalah representasi dari dinamika sosial masyarakat urban yang majemuk namun tetap menjunjung tinggi nilai gotong royong. Didominasi oleh usia produktif, warga aktif dalam berbagai sektor ekonomi, mulai dari perdagangan, jasa, hingga UMKM kreatif. Keberagaman latar belakang pendidikan dan budaya justru menjadi kekuatan utama dalam menciptakan lingkungan yang inklusif, aman, dan berdaya saing tinggi.", 
+                2 
+              )}
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= SECTION: PETA & WILAYAH ================= */}
+      <section className="py-16 px-6 lg:px-8 bg-cream border-t border-navy/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-12">
+            <h2 className="text-4xl font-serif font-bold text-navy">Peta & Wilayah</h2>
+            <div className="flex-1 h-px bg-navy/10"></div>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10">
+            {/* Kartu Informasi Wilayah */}
+            <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-xl shadow-navy/5 border border-navy/10 flex flex-col justify-center">
+              <h3 className="text-lg font-bold text-blue-primary uppercase tracking-widest mb-6">Batas Wilayah</h3>
+              
+              <div className="grid grid-cols-2 gap-x-4 gap-y-6 text-navy/80 mb-8">
+                <div>
+                  <span className="block text-sm font-bold text-navy mb-1">Utara</span>
+                  <span className="font-medium">{profilData?.batas_utara || '-'}</span>
+                </div>
+                <div>
+                  <span className="block text-sm font-bold text-navy mb-1">Timur</span>
+                  <span className="font-medium">{profilData?.batas_timur || '-'}</span>
+                </div>
+                <div>
+                  <span className="block text-sm font-bold text-navy mb-1">Selatan</span>
+                  <span className="font-medium">{profilData?.batas_selatan || '-'}</span>
+                </div>
+                <div>
+                  <span className="block text-sm font-bold text-navy mb-1">Barat</span>
+                  <span className="font-medium">{profilData?.batas_barat || '-'}</span>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-6 border-t border-navy/10">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-navy text-lg">Luas Desa</span>
+                  <span className="text-navy/80 font-medium text-lg">{profilData?.luas_desa || '-'}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-navy text-lg">Jumlah Penduduk</span>
+                  <span className="text-navy/80 font-medium text-lg">{profilData?.jumlah_penduduk || '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Kartu Embed Google Maps */}
+            <div className="bg-navy/5 rounded-[2.5rem] overflow-hidden border border-navy/10 h-[350px] lg:h-auto relative shadow-inner">
+              {profilData?.link_peta ? (
+                <iframe 
+                  src={profilData.link_peta} 
+                  width="100%" 
+                  height="100%" 
+                  style={{ border: 0 }} 
+                  allowFullScreen 
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="absolute inset-0"
+                ></iframe>
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-navy/40">
+                  <p className="font-medium tracking-wide">Link Peta belum ditambahkan</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= SECTION: STRUKTUR ORGANISASI ================= */}
+      <section className="py-24 px-6 lg:px-8 bg-cream">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="text-blue-primary font-bold uppercase tracking-widest text-sm mb-3 block">Perangkat Desa</span>
+            <h2 className="text-4xl font-serif font-bold text-navy">Struktur Organisasi</h2>
+          </div>
+          
+          <div className="bg-white p-4 rounded-[2rem] md:rounded-[3rem] shadow-xl shadow-navy/5 border border-navy/10">
+            <div className="w-full h-[60vh] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-navy/5 cursor-zoom-in">
+              {strukturImages.length > 0 ? (
+                <ImageSlider images={strukturImages} altPrefix="Struktur Organisasi" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-navy/40 font-medium">
+                  Gambar Struktur Organisasi belum diunggah.
+                </div>
+              )}
             </div>
           </div>
         </div>

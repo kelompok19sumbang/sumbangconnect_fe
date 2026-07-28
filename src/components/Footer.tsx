@@ -7,7 +7,7 @@ async function getFooterData() {
   try {
     // Memanggil endpoint API sumbang-connect
     // Menggunakan cache: 'no-store' agar web selalu menarik data terbaru tanpa perlu build ulang
-    const res = await fetch('http://103.82.92.95:1337/api/pengaturan-global', { cache: 'no-store' });
+    const res = await fetch('http://103.82.92.95/api/pengaturan-global', { cache: 'no-store' });
     
     if (!res.ok) return null;
     

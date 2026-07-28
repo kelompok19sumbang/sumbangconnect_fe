@@ -7,17 +7,22 @@ import ScrollReveal from '@/components/ScrollReveal';
 import ImageSlider from '@/components/ImageSlider';
 
 export default async function Home() {
-  // Fetch semua data secara paralel agar loading lebih cepat
-  const [beranda, umkmData, profilData] = await Promise.all([
-    getBeranda(),
-    getUmkm(),
-    getProfilDesa()
-  ]);
+  const beranda = await getBeranda();
+  const umkmData = await getUmkm();
+  const profilData = await getProfilDesa();
 
   const totalUmkm = umkmData ? umkmData.length : 0;
+  
   const fotoLurahUrl = beranda?.foto_lurah?.url 
     ? beranda.foto_lurah.url
     : 'https://via.placeholder.com/600x800?text=Foto+Lurah';
+
+  // ✅ MENANGKAP FOTO HERO DARI STRAPI (Dengan Fallback Placeholder Landscape)
+  const fotoHeroUrl = beranda?.foto_hero?.url 
+    ? beranda.foto_hero.url
+    : beranda?.foto_hero?.data?.attributes?.url
+      ? beranda.foto_hero.data.attributes.url
+      : 'https://images.pexels.com/photos/209266/pexels-photo-209266.jpeg?auto=compress&cs=tinysrgb&w=1200';
 
   const strukturImages = profilData?.foto_struktur_organisasi ? [profilData.foto_struktur_organisasi] : [];
 
@@ -114,25 +119,43 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="hidden lg:flex justify-center relative animate-fade-up" style={{ animationDelay: '0.2s' }}>
-            <div className="relative w-full max-w-[380px] aspect-[3/4] rounded-t-[10rem] rounded-b-[4rem] overflow-hidden border-8 border-white/10 shadow-2xl shadow-navy/50">
-              <img 
-                src="https://images.pexels.com/photos/209266/pexels-photo-209266.jpeg?auto=compress&cs=tinysrgb&w=800" 
-                alt="Kelurahan Sumbang" 
-                className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105"
-              />
-            </div>
+          {/* ================= KOLOM KANAN: GAMBAR HERO AESTHETIC (DIUBAH MELEBAR) ================= */}
+          <div className="hidden lg:flex justify-center animate-fade-up w-full" style={{ animationDelay: '0.2s' }}>
             
-            <div className="absolute -left-12 bottom-20 bg-white/95 backdrop-blur-md text-navy p-6 rounded-3xl shadow-2xl flex items-center gap-5 animate-float border border-white/50">
-              <div className="w-14 h-14 bg-accent rounded-full flex items-center justify-center text-navy font-bold text-xl shadow-inner">
-                {totalUmkm}
+            {/* WRAPPER KHUSUS: Diperlebar max-width-nya */}
+            <div className="relative w-full max-w-[550px] xl:max-w-[650px]">
+              
+              {/* Ornamen Garis Frame di Belakang (Disesuaikan lengkungannya) */}
+              <div className="absolute top-6 -right-6 xl:top-8 xl:-right-8 w-full h-full rounded-[3rem] border-[3px] border-white/40 -z-10 animate-pulse"></div>
+
+              {/* Bingkai Utama Foto: aspect ratio diubah jadi 4/3 dan lengkungan disesuaikan */}
+              <div className="relative w-full aspect-[4/3] rounded-[3rem] overflow-hidden border-[8px] border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)] group cursor-pointer z-10 bg-navy/50">
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-navy/10 to-transparent z-10 pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-700"></div>
+                
+                {/* Src diubah mengambil dari variabel fotoHeroUrl */}
+                <img 
+                  src={fotoHeroUrl} 
+                  alt="Kelurahan Sumbang" 
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                />
               </div>
-              <div>
-                <p className="font-extrabold text-xl tracking-tight">UMKM Aktif</p>
-                <p className="text-sm text-navy/60 font-medium">Terdaftar di sistem</p>
+              
+              {/* Floating Badge UMKM (Posisi digeser sedikit agar pas dengan frame lebar) */}
+              <div className="absolute -left-6 xl:-left-10 bottom-8 xl:bottom-12 bg-white/95 backdrop-blur-md text-navy p-4 xl:p-5 pr-6 xl:pr-8 rounded-3xl shadow-2xl flex items-center gap-4 xl:gap-5 animate-float border border-white/60 z-20 group-hover:-translate-y-2 transition-transform duration-500">
+                <div className="w-12 h-12 xl:w-14 xl:h-14 bg-accent rounded-full flex items-center justify-center text-navy font-bold text-xl xl:text-2xl shadow-inner">
+                  {totalUmkm}
+                </div>
+                <div>
+                  <p className="font-extrabold text-lg xl:text-xl tracking-tight">UMKM Aktif</p>
+                  <p className="text-xs xl:text-sm text-navy/60 font-medium">Terdaftar di sistem</p>
+                </div>
               </div>
+              
             </div>
           </div>
+          {/* ============================================================================== */}
+          
         </div>
       </div>
 
@@ -201,11 +224,10 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ================= SECTION: PROFIL DESA (SEJARAH, GEOGRAFI, DEMOGRAFI) ================= */}
+      {/* ================= SECTION: PROFIL DESA ================= */}
       <section id="profil-desa" className="py-32 px-6 lg:px-8 bg-cream">
         <div className="max-w-4xl mx-auto space-y-32">
           
-          {/* SEJARAH */}
           <div className="text-center">
             <div className="inline-flex items-center justify-center gap-4 mb-10 w-full">
               <div className="flex-1 h-px bg-navy/10 hidden sm:block"></div>
@@ -221,7 +243,6 @@ export default async function Home() {
             </div>
           </div>
 
-          {/* GEOGRAFI */}
           <div className="text-center">
             <div className="inline-flex items-center justify-center gap-4 mb-10 w-full">
               <div className="flex-1 h-px bg-navy/10 hidden sm:block"></div>
@@ -231,13 +252,12 @@ export default async function Home() {
             <div className="text-left">
               {renderScrollRevealContent(
                 profilData?.geografi, 
-                "Secara topografi, Kelurahan Sumbang terletak di dataran rendah yang strategis, menjadikannya salah satu urat nadi aktivitas masyarakat perkotaan. Wilayah ini berbatasan langsung dengan area pusat perbelanjaan, fasilitas kesehatan tingkat daerah, dan dilewati oleh jalur penghubung antar kecamatan. Iklim tropis dengan curah hujan menengah membuat lahan di sekitar kelurahan ini tetap asri dan mendukung program penghijauan lorong kota yang digagas oleh warga.", 
+                "Secara topografi, Kelurahan Sumbang terletak di dataran rendah yang strategis, menjadikannya salah satu urat nadi aktivitas masyarakat perkotaan.", 
                 -2 
               )}
             </div>
           </div>
 
-          {/* DEMOGRAFI */}
           <div className="text-center">
             <div className="inline-flex items-center justify-center gap-4 mb-10 w-full">
               <div className="flex-1 h-px bg-navy/10 hidden sm:block"></div>
@@ -247,7 +267,7 @@ export default async function Home() {
             <div className="text-left">
               {renderScrollRevealContent(
                 profilData?.demografi, 
-                "Masyarakat Kelurahan Sumbang adalah representasi dari dinamika sosial masyarakat urban yang majemuk namun tetap menjunjung tinggi nilai gotong royong. Didominasi oleh usia produktif, warga aktif dalam berbagai sektor ekonomi, mulai dari perdagangan, jasa, hingga UMKM kreatif. Keberagaman latar belakang pendidikan dan budaya justru menjadi kekuatan utama dalam menciptakan lingkungan yang inklusif, aman, dan berdaya saing tinggi.", 
+                "Masyarakat Kelurahan Sumbang adalah representasi dari dinamika sosial masyarakat urban yang majemuk namun tetap menjunjung tinggi nilai gotong royong.", 
                 2 
               )}
             </div>
@@ -265,7 +285,6 @@ export default async function Home() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-10">
-            {/* Kartu Informasi Wilayah */}
             <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-xl shadow-navy/5 border border-navy/10 flex flex-col justify-center">
               <h3 className="text-lg font-bold text-blue-primary uppercase tracking-widest mb-6">Batas Wilayah</h3>
               
@@ -300,7 +319,6 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* Kartu Embed Google Maps */}
             <div className="bg-navy/5 rounded-[2.5rem] overflow-hidden border border-navy/10 h-[350px] lg:h-auto relative shadow-inner">
               {profilData?.link_peta ? (
                 <iframe 

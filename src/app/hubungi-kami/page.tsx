@@ -6,7 +6,7 @@ import { getProfilDesa } from '@/lib/api';
 // Fungsi untuk mengambil data kontak dari Strapi (sama seperti di Footer)
 async function getSumbangConnectData() {
   try {
-    const res = await fetch('http://103.82.92.95:1337/api/pengaturan-global', { cache: 'no-store' });
+    const res = await fetch('http://103.82.92.95/api/pengaturan-global', { cache: 'no-store' });
     if (!res.ok) return null;
     const json = await res.json();
     return json.data?.attributes || json.data || null;  

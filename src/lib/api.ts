@@ -30,18 +30,26 @@ export async function getUmkmById(documentId: string): Promise<UmkmItem> {
   return json.data;
 }
 
+// Ganti fungsi getProfilDesa di api.ts menjadi seperti ini:
+
 export async function getProfilDesa() {
-  const res = await fetch('http://103.82.92.95/api/profil-desa?populate=*', {
-    cache: 'no-store'
-  });
-  
-  if (!res.ok) {
-    console.error("Gagal mengambil Profil Desa:", await res.text());
-    return null; 
+  try {
+    const res = await fetch('http://103.82.92.95/api/profil-desa?populate=*', {
+      cache: 'no-store'
+    });
+    
+    if (!res.ok) {
+      console.error("Gagal mengambil Profil Desa");
+      return null; 
+    }
+    
+    const json = await res.json();
+    return json.data;
+  } catch (error) {
+    // Kalau server timeout/down, error akan ditangkap di sini dan TIDAK bikin web crash
+    console.error("Koneksi Timeout saat mengambil Profil Desa:", error);
+    return null;
   }
-  
-  const json = await res.json();
-  return json.data;
 }
 
 export async function getInfografis() {

@@ -10,7 +10,6 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  // Menu "Profil Desa" sudah dihapus dari daftar ini
   const navLinks = [
     { name: 'Beranda', href: '/' },
     { name: 'Berita', href: '/berita' },
@@ -76,7 +75,7 @@ export default function Navbar() {
 
       {/* Mobile Dropdown */}
       {isOpen && (
-        <div className="lg:hidden bg-navy border-t border-white/10 pb-4 shadow-xl">
+        <div className="lg:hidden bg-navy border-t border-white/10 pb-6 shadow-xl">
           <div className="px-4 pt-2 space-y-2">
             {navLinks.map((link) => (
               <Link
@@ -90,6 +89,17 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
+            
+            {/* TAMBAHAN: Tombol Hubungi Kami Khusus Mobile */}
+            <div className="pt-4 mt-2 border-t border-white/10">
+              <Link
+                href="/hubungi-kami"
+                onClick={() => setIsOpen(false)}
+                className="block w-full text-center bg-accent text-navy px-4 py-3.5 rounded-xl text-base font-bold hover:bg-white transition-colors shadow-sm"
+              >
+                Hubungi Kami
+              </Link>
+            </div>
           </div>
         </div>
       )}

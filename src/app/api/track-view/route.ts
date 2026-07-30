@@ -5,8 +5,8 @@ export async function POST(request: Request) {
   try {
     const { documentId, currentViews } = await request.json();
     
-    // Pastikan URL dan Token terbaca dari file .env kamu
-    const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://127.0.0.1:1337';
+    // NAMA VARIABEL SUDAH SINKRON DENGAN VERCEL & FALLBACK PAKAI IP VPS
+    const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95';
     const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN; 
 
     // Kirim request UPDATE (PUT) ke Strapi

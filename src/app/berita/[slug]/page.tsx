@@ -79,9 +79,10 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
 
       // ✅ 4. Render GAMBAR SISIPAN DI TENGAH TEKS
       if (block.type === 'image') {
-        const imgUrl = block.image?.url 
-          ? `http://127.0.0.1:1337${block.image.url}` 
-          : '';
+        // Ganti https://api.sumbangconnect.com dengan URL atau IP VPS Strapi kamu yang sebenarnya
+const imgUrl = block.image?.url 
+  ? `https://api.sumbangconnect.com${block.image.url}` 
+  : '';
         const imgAlt = block.image?.alternativeText || `Ilustrasi ${artikel.judul}`;
         const imgCaption = block.image?.caption;
 

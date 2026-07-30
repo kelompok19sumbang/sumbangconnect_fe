@@ -1,18 +1,24 @@
-// src/components/ViewTracker.tsx
 'use client';
+
 import { useEffect } from 'react';
 
 export default function ViewTracker({ documentId, currentViews }: { documentId: string, currentViews: number }) {
   useEffect(() => {
-    // Tembak API Strapi pakai method PUT untuk update view_count
-    fetch(`http://127.0.0.1:1337/api/data-berita/${documentId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        data: { view_count: (currentViews || 0) + 1 }
-      })
-    }).catch(console.error); // Error dibiarkan silent agar web tidak crash
+    // Cek apakah user sudah membaca artikel ini di sesi browser ini
+    const isTracked = sessionStorage.getItem(`viewed_${documentId}`);
+    
+    if (!isTracked) {
+      // Tembak ke API Route internal Next.js kita
+      fetch('/api/track-view', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentId, currentViews: currentViews || 0 })
+      });
+      
+      // Tandai sudah dibaca biar ga spam hit
+      sessionStorage.setItem(`viewed_${documentId}`, 'true');
+    }
   }, [documentId, currentViews]);
 
-  return null; // Komponen ini invisible (tidak merender apa-apa di layar)
+  return null; // Komponen ini siluman (tidak nampak di UI)
 }

@@ -48,10 +48,12 @@ export default async function BeritaPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {beritaData.length > 0 ? (
             beritaData.map((item: any) => {
-              const thumbnailUrl = item.thumbnail?.url 
-                ? `http://127.0.0.1:1337${item.thumbnail.url}` 
-                : 'https://via.placeholder.com/600x400?text=SumbangConnect';
+              // Ambil URL dari environment variable (kalau tidak ada, pakai IP VPS sebagai cadangan)
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95';
 
+const thumbnailUrl = item.thumbnail?.url 
+  ? `${STRAPI_URL}${item.thumbnail.url}` 
+  : 'https://via.placeholder.com/600x400?text=SumbangConnect';
               // LOGIKA EXTERNAL LINK
               const isExternal = !!item.link_external;
               const targetUrl = isExternal ? item.link_external : `/berita/${item.slug}`;

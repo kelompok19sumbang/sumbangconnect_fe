@@ -23,9 +23,11 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
      redirect(artikel.link_external);
   }
 
-  const thumbnailUrl = artikel.thumbnail?.url 
-    ? `http://127.0.0.1:1337${artikel.thumbnail.url}` 
-    : 'https://via.placeholder.com/1200x600?text=SumbangConnect';
+// Menjadi ini (agar dinamis mengikuti server):
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95';
+const thumbnailUrl = artikel.thumbnail?.url
+  ? `${STRAPI_URL}${artikel.thumbnail.url}`
+  : 'https://via.placeholder.com/...';
     
   const thumbnailCaption = artikel.thumbnail?.caption || artikel.thumbnail?.alternativeText || `Dokumentasi Liputan: ${artikel.judul}`;
 

@@ -1,6 +1,6 @@
 // src/app/page.tsx
 import Link from 'next/link';
-import { getBeranda, getUmkm, getProfilDesa } from '@/lib/api'; 
+import { getBeranda, getUmkm, getProfilDesa, getInfografis } from '@/lib/api'; 
 import BlurText from '@/components/BlurText';
 import CurvedLoop from '@/components/CurvedLoop';
 import ScrollReveal from '@/components/ScrollReveal';
@@ -10,6 +10,9 @@ export default async function Home() {
   const beranda = await getBeranda();
   const umkmData = await getUmkm();
   const profilData = await getProfilDesa();
+  
+  // Asumsi fungsi ini mengambil data dari Single Type "Statistik" sesuai screenshot
+  const infografisData = await getInfografis(); 
 
   const totalUmkm = umkmData ? umkmData.length : 0;
   
@@ -17,7 +20,6 @@ export default async function Home() {
     ? beranda.foto_lurah.url
     : 'https://via.placeholder.com/600x800?text=Foto+Lurah';
 
-  // ✅ MENANGKAP FOTO HERO DARI STRAPI (Dengan Fallback Placeholder Landscape)
   const fotoHeroUrl = beranda?.foto_hero?.url 
     ? beranda.foto_hero.url
     : beranda?.foto_hero?.data?.attributes?.url
@@ -26,7 +28,6 @@ export default async function Home() {
 
   const strukturImages = profilData?.foto_struktur_organisasi ? [profilData.foto_struktur_organisasi] : [];
 
-  // Fungsi khusus merender teks panjang dengan animasi ScrollReveal dari halaman profil
   const renderScrollRevealContent = (content: any, fallbackText: string, rotation: number) => {
     if (Array.isArray(content) && content.length > 0) {
       return content.map((block, index) => {
@@ -70,98 +71,101 @@ export default async function Home() {
     <main className="min-h-screen bg-cream font-sans pb-24">
       
       {/* ================= HERO SECTION ================= */}
-      <div className="bg-gradient-to-br from-navy via-blue-primary to-blue-cyan text-white rounded-b-[3rem] md:rounded-b-[5rem] pt-12 pb-32 px-6 lg:px-8 relative overflow-hidden shadow-2xl z-30">
+      <section className="relative w-full min-h-[90vh] flex flex-col justify-between overflow-hidden z-30">
         
-        {/* Tekstur Halus Cubes & Glow */}
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none z-0"></div>
-        <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-blue-light/20 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/3 pointer-events-none z-0"></div>
-        
-        {/* Supergrafis Aesthetic */}
-        <svg className="absolute inset-0 w-full h-full text-white/15 pointer-events-none z-0" viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-          <path d="M-100,300 C300,100 500,600 1000,300 C1300,150 1500,400 1600,450" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-          <path d="M-50,330 C320,140 480,630 1020,330" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
-          <circle cx="1150" cy="200" r="6" fill="currentColor" />
-          <circle cx="1175" cy="180" r="3.5" fill="currentColor" opacity="0.7" />
-          <circle cx="1195" cy="210" r="2" fill="currentColor" opacity="0.5" />
-          <circle cx="1220" cy="190" r="1.5" fill="currentColor" opacity="0.3" />
-        </svg>
-
-        <svg className="absolute bottom-[-10%] left-[-5%] w-[30rem] h-[30rem] text-white/20 pointer-events-none z-0" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M50,400 C100,250 250,150 400,200" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
-          <circle cx="350" cy="150" r="5" fill="currentColor" />
-        </svg>
-
-        <svg className="absolute top-10 right-0 w-[40rem] h-[40rem] text-white/10 pointer-events-none z-0 rotate-12" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M450,-50 C250,100 150,400 500,500" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-          <path d="M480,-20 C290,120 190,400 520,480" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
-
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10 mt-4">
-          <div className="text-center lg:text-left animate-fade-up">
-            <BlurText 
-              text={beranda?.judul_hero || 'Selamat Datang di Portal Digital SumbangConnect'}
-              delay={50} 
-              animateBy="words" 
-              direction="top" 
-              className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.15] whitespace-pre-line text-white"
-            />
-            
-            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed font-light whitespace-pre-line relative z-10">
-              {beranda?.subjudul_hero || 'Pusat informasi layanan masyarakat, fasilitas kesehatan, dan direktori UMKM lokal yang dirancang untuk masa depan.'}
-            </p>
-            <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start relative z-10">
-              <Link href="/umkm" className="bg-accent text-navy px-8 py-4 rounded-full font-bold hover:bg-white transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 w-full sm:w-auto text-center">
-                Jelajahi UMKM
-              </Link>
-              <Link href="#profil-desa" className="text-white px-8 py-4 rounded-full font-medium hover:bg-white/10 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center">
-                Profil Desa <span className="animate-bounce">↓</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* ================= KOLOM KANAN: GAMBAR HERO AESTHETIC (DIUBAH MELEBAR) ================= */}
-          <div className="hidden lg:flex justify-center animate-fade-up w-full" style={{ animationDelay: '0.2s' }}>
-            
-            {/* WRAPPER KHUSUS: Diperlebar max-width-nya */}
-            <div className="relative w-full max-w-[550px] xl:max-w-[650px]">
-              
-              {/* Ornamen Garis Frame di Belakang (Disesuaikan lengkungannya) */}
-              <div className="absolute top-6 -right-6 xl:top-8 xl:-right-8 w-full h-full rounded-[3rem] border-[3px] border-white/40 -z-10 animate-pulse"></div>
-
-              {/* Bingkai Utama Foto: aspect ratio diubah jadi 4/3 dan lengkungan disesuaikan */}
-              <div className="relative w-full aspect-[4/3] rounded-[3rem] overflow-hidden border-[8px] border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)] group cursor-pointer z-10 bg-navy/50">
-                {/* Overlay Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-navy/10 to-transparent z-10 pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-700"></div>
-                
-                {/* Src diubah mengambil dari variabel fotoHeroUrl */}
-                <img 
-                  src={fotoHeroUrl} 
-                  alt="Kelurahan Sumbang" 
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                />
-              </div>
-              
-              {/* Floating Badge UMKM (Posisi digeser sedikit agar pas dengan frame lebar) */}
-              <div className="absolute -left-6 xl:-left-10 bottom-8 xl:bottom-12 bg-white/95 backdrop-blur-md text-navy p-4 xl:p-5 pr-6 xl:pr-8 rounded-3xl shadow-2xl flex items-center gap-4 xl:gap-5 animate-float border border-white/60 z-20 group-hover:-translate-y-2 transition-transform duration-500">
-                <div className="w-12 h-12 xl:w-14 xl:h-14 bg-accent rounded-full flex items-center justify-center text-navy font-bold text-xl xl:text-2xl shadow-inner">
-                  {totalUmkm}
-                </div>
-                <div>
-                  <p className="font-extrabold text-lg xl:text-xl tracking-tight">UMKM Aktif</p>
-                  <p className="text-xs xl:text-sm text-navy/60 font-medium">Terdaftar di sistem</p>
-                </div>
-              </div>
-              
-            </div>
-          </div>
-          {/* ============================================================================== */}
-          
+        {/* Background Image & Overlay */}
+        <div className="absolute inset-0 z-0 bg-navy">
+          <img
+            src={fotoHeroUrl}
+            alt="Pemandangan Kelurahan Sumbang"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-navy/60 via-navy/70 to-blue-primary/90 mix-blend-multiply"></div>
         </div>
-      </div>
+
+        {/* Konten Teks Utama */}
+        <div className="relative z-10 flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full px-6 lg:px-8 pt-32 pb-12 animate-fade-up">
+          
+          <p className="text-white/90 text-sm md:text-base font-medium mb-3 md:mb-5 tracking-wide">
+            Pemerintah Kelurahan - Kecamatan Bojonegoro, Kab. Bojonegoro
+          </p>
+          
+          <BlurText 
+            text={beranda?.judul_hero || 'Kelurahan \nSumbang'}
+            delay={50} 
+            animateBy="words" 
+            direction="top" 
+            className="text-5xl md:text-7xl font-extrabold text-white mb-4 leading-tight drop-shadow-md whitespace-pre-line"
+          />
+          
+          <p className="text-white/90 text-lg md:text-xl max-w-2xl mt-2 mb-8 drop-shadow-sm leading-relaxed">
+            {beranda?.subjudul_hero || 'Informasi resmi kelurahan — berita, potensi ekonomi, dan pelayanan publik untuk warga.'}
+          </p>
+          
+          <div className="flex flex-wrap gap-4">
+            <Link 
+              href="/fasilitas" 
+              className="bg-accent text-navy font-bold py-3 px-8 rounded-lg w-fit flex items-center gap-3 hover:bg-yellow-400 hover:scale-105 transition-all duration-300 shadow-lg shadow-accent/20"
+            >
+              Potensi Kelurahan
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
+        {/* ================= BARIS STATISTIK (UPDATE DATA DARI SCREENSHOT) ================= */}
+        <div className="relative z-10 bg-navy/80 backdrop-blur-md border-b-4 border-accent w-full py-6 md:py-8 mt-auto shadow-2xl">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 text-white text-left items-center">
+              
+              {/* Stat 1: Populasi Total */}
+              <div className="border-l-2 border-white/20 pl-4">
+                <h3 className="text-3xl md:text-5xl font-bold tracking-tight">
+                  {/* Gunakan toLocaleString agar ada titik ribuannya */}
+                  {infografisData?.populasi_total?.toLocaleString('id-ID') || '5.036'}
+                </h3>
+                <p className="text-xs md:text-sm text-white/80 mt-1 font-medium">jiwa terdaftar</p>
+              </div>
+              
+              {/* Stat 2: Luas Total */}
+              <div className="border-l-2 border-white/20 pl-4">
+                <h3 className="text-3xl md:text-5xl font-bold tracking-tight">
+                  {infografisData?.luas_total || '192'}
+                </h3>
+                <p className="text-xs md:text-sm text-white/80 mt-1 font-medium">Ha luas wilayah</p>
+              </div>
+              
+              {/* Stat 3: RT & RW */}
+              <div className="border-l-2 border-white/20 pl-4">
+                {/* Dibuat format: 29 RT / 7 RW biar lebih informatif */}
+                <h3 className="text-2xl md:text-3xl font-bold tracking-tight flex items-baseline gap-1.5 flex-wrap">
+                  <span>{infografisData?.rt || '29'}</span>
+                  <span className="text-sm md:text-base font-normal text-white/70">RT</span>
+                  <span className="text-white/30 px-1">/</span>
+                  <span>{infografisData?.rw || '7'}</span>
+                  <span className="text-sm md:text-base font-normal text-white/70">RW</span>
+                </h3>
+                <p className="text-xs md:text-sm text-white/80 mt-1 font-medium">lingkungan warga</p>
+              </div>
+              
+              {/* Stat 4: UMKM Terdaftar */}
+              <div className="border-l-2 border-accent pl-4">
+                <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-accent">
+                  {totalUmkm}
+                </h3>
+                <p className="text-xs md:text-sm text-accent/80 mt-1 font-medium">UMKM terdaftar</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ================= CURVED LOOP DIVIDER ================= */}
-      <div className="w-full bg-cream text-blue-primary overflow-hidden relative -mt-20 pt-20 pb-4 z-20">
-        <CurvedLoop marqueeText="Sumbang digdaya! Mengabdi dengan aksi, Bekarya dengan hati :D" speed={0.5} curveAmount={150} direction="left" />
+      <div className="w-full bg-cream text-blue-primary overflow-hidden relative py-6 z-20 shadow-sm border-b border-navy/5">
+        <CurvedLoop marqueeText="Sumbang digdaya! Mengabdi dengan aksi, Berkarya dengan hati :D" speed={0.5} curveAmount={150} direction="left" />
       </div>
 
       {/* ================= SECTION: SAMBUTAN LURAH ================= */}

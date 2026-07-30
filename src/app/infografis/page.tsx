@@ -57,6 +57,16 @@ export default async function Infografis() {
     { name: 'Petani/Pekebun', jumlah: 39 },
   ];
 
+  // ✅ TAMBAHAN DATA KESEHATAN (Diambil dari Strapi)
+  const dataKesehatan = [
+    { name: 'ISPA', jumlah: data.penyakit_ispa || 0 },
+    { name: 'Hipertensi', jumlah: data.penyakit_hipertensi || 0 },
+    { name: 'Diabetes', jumlah: data.penyakit_diabetes || 0 },
+    { name: 'Diare', jumlah: data.penyakit_diare || 0 },
+    { name: 'Demam Berdarah (DBD)', jumlah: data.penyakit_dbd || 0 },
+    { name: 'Kasus Stunting', jumlah: data.stunting || 0 },
+  ];
+
   return (
     <main className="min-h-screen bg-cream font-sans pb-32">
       
@@ -66,18 +76,15 @@ export default async function Infografis() {
         <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-blue-light/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
         
         {/* ================= MOTIF SUPERGRAFIS AESTHETIC ================= */}
-        {/* Garis Flowing Lebar */}
         <svg className="absolute inset-0 w-full h-full text-white/10 pointer-events-none z-0" viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
           <path d="M-100,300 C300,100 500,600 1000,300 C1300,150 1500,400 1600,450" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
           <path d="M-50,330 C320,140 480,630 1020,330" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
-          {/* Ornamen Titik Estetik */}
           <circle cx="1150" cy="200" r="6" fill="currentColor" />
           <circle cx="1175" cy="180" r="3.5" fill="currentColor" opacity="0.7" />
           <circle cx="1195" cy="210" r="2" fill="currentColor" opacity="0.5" />
           <circle cx="1220" cy="190" r="1.5" fill="currentColor" opacity="0.3" />
         </svg>
 
-        {/* Motif Melingkar Kanan Atas */}
         <svg className="absolute top-0 right-0 w-[40rem] h-[40rem] text-white/10 pointer-events-none z-0 rotate-12" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M450,-50 C250,100 150,400 500,500" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
           <path d="M480,-20 C290,120 190,400 520,480" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -88,7 +95,6 @@ export default async function Infografis() {
           <span className="inline-block px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-widest bg-accent text-navy mb-6 shadow-sm border border-accent/20">
             BPS Bojonegoro 2025
           </span>
-          {/* Judul dengan Efek BlurText */}
           <div className="flex flex-wrap justify-center items-center gap-x-3 mb-6">
             <BlurText 
               text="Infografis" 
@@ -227,7 +233,6 @@ export default async function Infografis() {
                   {item.range}
                 </div>
                 <div className="flex-1 h-8 bg-navy/5 rounded-r-xl overflow-hidden relative border border-navy/10 shadow-inner">
-                  {/* Pemanggilan AnimatedBar */}
                   <AnimatedBar 
                     widthPercent={(item.jumlah / maxUsia) * 100} 
                     value={item.jumlah} 
@@ -245,7 +250,7 @@ export default async function Infografis() {
           <PendidikanChart data={dataPendidikan} />
         </div>
 
-        {/* BAGIAN PEKERJAAN dengan Hover Lift */}
+        {/* BAGIAN PEKERJAAN */}
         <div className="mb-16">
           <h2 className="text-3xl font-serif font-bold text-navy mb-8">Berdasarkan Pekerjaan</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
@@ -256,12 +261,31 @@ export default async function Infografis() {
                 <p className="text-4xl font-serif font-bold bg-gradient-to-br from-navy to-blue-primary bg-clip-text text-transparent group-hover:from-blue-primary group-hover:to-blue-cyan transition-colors duration-300">
                   <CountUp from={0} to={job.jumlah} separator="." duration={1.5} delay={0.2 + (idx * 0.1)} />
                 </p>
+                <span className="text-xs text-navy/40 font-medium mt-2 block">Jiwa</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ✅ BAGIAN KESEHATAN (BARU) */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-serif font-bold text-navy mb-8">Data Kesehatan Masyarakat</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            {dataKesehatan.map((penyakit, idx) => (
+              <div key={idx} className="bg-white p-6 rounded-2xl border border-navy/10 shadow-sm hover:shadow-xl hover:shadow-navy/15 hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group cursor-default">
+                {/* Aksen warna sedikit berbeda (menggunakan accent/kuning) agar terlihat fresh tapi tetap senada */}
+                <div className="absolute top-0 left-0 w-1 h-full bg-accent/50 group-hover:bg-accent transition-colors"></div>
+                <h3 className="text-sm font-bold text-navy/60 mb-4">{penyakit.name}</h3>
+                <p className="text-4xl font-serif font-bold bg-gradient-to-br from-navy to-blue-primary bg-clip-text text-transparent group-hover:from-blue-primary group-hover:to-blue-cyan transition-colors duration-300">
+                  <CountUp from={0} to={penyakit.jumlah} separator="." duration={1.5} delay={0.2 + (idx * 0.1)} />
+                </p>
+                <span className="text-xs text-navy/40 font-medium mt-2 block">Kasus tercatat</span>
               </div>
             ))}
           </div>
         </div>
 
       </div>
-    </main>
+    </main> 
   );
 }

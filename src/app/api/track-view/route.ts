@@ -4,7 +4,7 @@ export async function POST(request: Request) {
   try {
     const { documentId, currentViews } = await request.json();
     
-    const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95';
+    const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95:1337';
     const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN; 
 
     const response = await fetch(`${STRAPI_URL}/api/beritas/${documentId}`, {

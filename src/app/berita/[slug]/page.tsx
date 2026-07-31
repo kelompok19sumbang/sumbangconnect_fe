@@ -116,7 +116,10 @@ const imgUrl = block.image?.url
   return (
     <main className="min-h-screen bg-cream font-sans pb-24 pt-32 relative">
       
-      <ViewTracker documentId={artikel.documentId} currentViews={artikel.view_count} />
+      <ViewTracker
+    id={artikel.id}
+    currentViews={artikel.view_count ?? 0}
+/>
       <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none z-0"></div>
 
       <div className="max-w-4xl mx-auto px-6 mb-8 relative z-10">

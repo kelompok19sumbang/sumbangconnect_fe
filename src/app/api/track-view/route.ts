@@ -1,38 +1,127 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const { documentId, currentViews } = await request.json();
-    
-    const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95:1337';
-    const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN; 
+    const { id, currentViews } = await request.json();
 
-    const response = await fetch(`${STRAPI_URL}/api/beritas/${documentId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${STRAPI_TOKEN}`, 
-      },
-      body: JSON.stringify({
-        data: {
-          view_count: currentViews + 1
+    const STRAPI_URL =
+      process.env.NEXT_PUBLIC_STRAPI_URL ||
+      "http://103.82.92.95:1337";
+
+    const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
+
+    const cleanUrl = STRAPI_URL.replace(/\/$/, "");
+
+    console.log("========== TRACK VIEW ==========");
+    console.log("ID:", id);
+    console.log("Current Views:", currentViews);
+
+
+    // Cari berita berdasarkan id
+    const findResponse = await fetch(
+      `${cleanUrl}/api/data-berita?filters[id][$eq]=${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${STRAPI_TOKEN}`,
+        },
+      }
+    );
+
+
+    const findData = await findResponse.json();
+
+    console.log(
+      "DATA FIND:",
+      JSON.stringify(findData, null, 2)
+    );
+
+
+    const berita = findData?.data?.[0];
+
+
+    if (!berita) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Berita tidak ditemukan",
+        },
+        {
+          status: 404,
         }
-      })
-    });
-
-    // CCTV 1: JIKA STRAPI MENOLAK (Misal 403 Forbidden atau 404 Not Found)
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error("STRAPI NGAMBEK - Status:", response.status, "Pesan:", errorText);
-        return NextResponse.json({ success: false, pesan_strapi: errorText }, { status: response.status });
+      );
     }
 
-    const data = await response.json();
-    return NextResponse.json({ success: true, data });
+
+    const documentId = berita.documentId;
+
+
+    console.log(
+      "DOCUMENT ID:",
+      documentId
+    );
+
+
+    const newViews =
+      (berita.view_count ?? 0) + 1;
+
+
+    // Update view_count
+    const updateResponse = await fetch(
+      `${cleanUrl}/api/data-berita/${documentId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${STRAPI_TOKEN}`,
+        },
+        body: JSON.stringify({
+          data: {
+            view_count: newViews,
+          },
+        }),
+      }
+    );
+
+
+    console.log(
+      "UPDATE STATUS:",
+      updateResponse.status
+    );
+
+
+    const updateText =
+      await updateResponse.text();
+
+
+    console.log(
+      "UPDATE RESPONSE:",
+      updateText
+    );
+
+
+    return NextResponse.json({
+      success: updateResponse.ok,
+      views: newViews,
+      response: updateText,
+    });
+
 
   } catch (error: any) {
-    // CCTV 2: JIKA KONEKSI PUTUS / CRASH SISTEM
-    console.error("SISTEM CRASH:", error.message);
-    return NextResponse.json({ success: false, pesan_sistem: error.message }, { status: 500 });
+
+    console.error(
+      "TRACK VIEW ERROR:",
+      error
+    );
+
+
+    return NextResponse.json(
+      {
+        success:false,
+        message:error.message,
+      },
+      {
+        status:500,
+      }
+    );
   }
 }

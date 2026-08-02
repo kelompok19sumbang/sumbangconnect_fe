@@ -26,7 +26,7 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
   // URL Dasar Server (Gunakan IP VPS kamu)
   const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95';
 
-  // 1. Render Thumbnail Anti-Badai + Proxy HTTPS
+ // 1. Render Thumbnail Anti-Badai
   let thumbPath = '';
   if (artikel.thumbnail?.data?.attributes?.url) {
     thumbPath = artikel.thumbnail.data.attributes.url;
@@ -34,11 +34,12 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
     thumbPath = artikel.thumbnail.url;
   }
 
-  // Bypass error HTTP di Vercel menggunakan Image Proxy (wsrv.nl)
-  const thumbnailUrl = thumbPath
-    ? `https://wsrv.nl/?url=${STRAPI_URL.replace('http://', '')}${thumbPath}`
+  // 🔥 FIX: Pakai corsproxy.io yang bebas blokir IP Address
+  const fullThumbUrl = thumbPath ? `${STRAPI_URL}${thumbPath}` : '';
+  const thumbnailUrl = fullThumbUrl
+    ? `https://corsproxy.io/?${encodeURIComponent(fullThumbUrl)}`
     : 'https://via.placeholder.com/1200x800?text=Belum+Ada+Gambar';
-    
+
   const thumbnailCaption = artikel.thumbnail?.caption || artikel.thumbnail?.alternativeText || `Dokumentasi Liputan: ${artikel.judul}`;
 
   const formatTanggal = (tanggal: string) => {
@@ -89,7 +90,7 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
         );
       }
 
-      // ✅ 4. Render GAMBAR SISIPAN DI TENGAH TEKS
+     // ✅ 4. Render GAMBAR SISIPAN DI TENGAH TEKS
       if (block.type === 'image') {
         
         let blockImgPath = '';
@@ -99,9 +100,10 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
           blockImgPath = block.image.url;
         }
 
-        // Tembak pakai proxy biar jadi HTTPS dan lolos blokir Vercel
-        const imgUrl = blockImgPath 
-          ? `https://wsrv.nl/?url=${STRAPI_URL.replace('http://', '')}${blockImgPath}` 
+        // 🔥 FIX: Pakai corsproxy.io untuk gambar sisipan juga
+        const fullInnerUrl = blockImgPath ? `${STRAPI_URL}${blockImgPath}` : '';
+        const imgUrl = fullInnerUrl 
+          ? `https://corsproxy.io/?${encodeURIComponent(fullInnerUrl)}` 
           : '';
           
         const imgAlt = block.image?.alternativeText || `Ilustrasi ${artikel.judul}`;

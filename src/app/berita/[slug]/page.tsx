@@ -59,7 +59,7 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
     if (!blocks || !Array.isArray(blocks)) return null;
     return blocks.map((block, index) => {
       
-      // 1. Render Teks/Paragraf
+      // 1. Render Teks/Paragraf (Support Link/Hyperlink dari Strapi)
       if (block.type === 'paragraph') {
         return (
           <p key={index} className="mb-6 text-navy/80 leading-loose text-lg">
@@ -68,6 +68,24 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
               if (child.bold) className += "font-bold ";
               if (child.italic) className += "italic ";
               if (child.underline) className += "underline ";
+
+              // 🔥 Jika anak teks ini memiliki URL (Link dari Strapi)
+              if (child.type === 'link' || child.url) {
+                return (
+                  <a 
+                    key={i} 
+                    href={child.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-blue-primary font-bold underline hover:text-navy transition-colors inline-flex items-center gap-1"
+                  >
+                    {child.children?.map((subChild: any) => subChild.text).join('') || child.text}
+                    <svg className="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                  </a>
+                );
+              }
+
+              // Render teks biasa dengan styling-nya
               return <span key={i} className={className}>{child.text}</span>;
             })}
           </p>

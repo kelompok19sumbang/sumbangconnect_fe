@@ -23,11 +23,21 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
      redirect(artikel.link_external);
   }
 
-// Menjadi ini (agar dinamis mengikuti server):
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95';
-const thumbnailUrl = artikel.thumbnail?.url
-  ? `${STRAPI_URL}${artikel.thumbnail.url}`
-  : 'https://via.placeholder.com/...';
+  // URL Dasar Server (Gunakan IP VPS kamu)
+  const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95';
+
+  // 1. Render Thumbnail Anti-Badai + Proxy HTTPS
+  let thumbPath = '';
+  if (artikel.thumbnail?.data?.attributes?.url) {
+    thumbPath = artikel.thumbnail.data.attributes.url;
+  } else if (artikel.thumbnail?.url) {
+    thumbPath = artikel.thumbnail.url;
+  }
+
+  // Bypass error HTTP di Vercel menggunakan Image Proxy (wsrv.nl)
+  const thumbnailUrl = thumbPath
+    ? `https://wsrv.nl/?url=${STRAPI_URL.replace('http://', '')}${thumbPath}`
+    : 'https://via.placeholder.com/1200x800?text=Belum+Ada+Gambar';
     
   const thumbnailCaption = artikel.thumbnail?.caption || artikel.thumbnail?.alternativeText || `Dokumentasi Liputan: ${artikel.judul}`;
 
@@ -81,10 +91,19 @@ const thumbnailUrl = artikel.thumbnail?.url
 
       // ✅ 4. Render GAMBAR SISIPAN DI TENGAH TEKS
       if (block.type === 'image') {
-        // Ganti https://api.sumbangconnect.com dengan URL atau IP VPS Strapi kamu yang sebenarnya
-const imgUrl = block.image?.url 
-  ? `https://api.sumbangconnect.com${block.image.url}` 
-  : '';
+        
+        let blockImgPath = '';
+        if (block.image?.data?.attributes?.url) {
+          blockImgPath = block.image.data.attributes.url;
+        } else if (block.image?.url) {
+          blockImgPath = block.image.url;
+        }
+
+        // Tembak pakai proxy biar jadi HTTPS dan lolos blokir Vercel
+        const imgUrl = blockImgPath 
+          ? `https://wsrv.nl/?url=${STRAPI_URL.replace('http://', '')}${blockImgPath}` 
+          : '';
+          
         const imgAlt = block.image?.alternativeText || `Ilustrasi ${artikel.judul}`;
         const imgCaption = block.image?.caption;
 
@@ -117,9 +136,9 @@ const imgUrl = block.image?.url
     <main className="min-h-screen bg-cream font-sans pb-24 pt-32 relative">
       
       <ViewTracker
-    id={artikel.id}
-    currentViews={artikel.view_count ?? 0}
-/>
+        id={artikel.id}
+        currentViews={artikel.view_count ?? 0}
+      />
       <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none z-0"></div>
 
       <div className="max-w-4xl mx-auto px-6 mb-8 relative z-10">

@@ -8,9 +8,15 @@ import ImageSlider from '@/components/ImageSlider';
 
 export default async function Home() {
   const beranda = await getBeranda();
+  
   const umkmData = await getUmkm();
   const profilData = await getProfilDesa();
   
+  // ====== PASANG CCTV DI SINI ======
+  console.log("=== CEK DATA BERANDA DARI STRAPI ===");
+  console.log("Apakah ada isi foto struktur?", JSON.stringify(beranda?.foto_struktur_organisasi, null, 2));
+  // =================================
+
   // Asumsi fungsi ini mengambil data dari Single Type "Statistik" sesuai screenshot
   const infografisData = await getInfografis(); 
 
@@ -26,7 +32,17 @@ export default async function Home() {
       ? beranda.foto_hero.data.attributes.url
       : 'https://images.pexels.com/photos/209266/pexels-photo-209266.jpeg?auto=compress&cs=tinysrgb&w=1200';
 
-  const strukturImages = profilData?.foto_struktur_organisasi ? [profilData.foto_struktur_organisasi] : [];
+  // FIX: Tambahkan tipe any[] dan ambil datanya dari variabel 'beranda'
+  let strukturImages: any[] = [];
+
+  if (beranda?.foto_struktur_organisasi) {
+    if (beranda.foto_struktur_organisasi.data?.attributes?.url) {
+      strukturImages = [beranda.foto_struktur_organisasi.data.attributes];
+    } 
+    else if (beranda.foto_struktur_organisasi.url) {
+      strukturImages = [beranda.foto_struktur_organisasi];
+    }
+  }
 
   const renderScrollRevealContent = (content: any, fallbackText: string, rotation: number) => {
     if (Array.isArray(content) && content.length > 0) {

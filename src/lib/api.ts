@@ -67,17 +67,23 @@ export async function getInfografis() {
 }
 
 export async function getPengaturanGlobal() {
-  const res = await fetch('http://103.82.92.95/api/pengaturan-global', {
-    cache: 'no-store' 
-  });
-  
-  if (!res.ok) {
-    console.error("Gagal mengambil data Pengaturan Global");
+  try {
+    // 🔥 Wajib pakai port 1337 dan ?populate=* agar data gambarnya ikut terbawa
+    const res = await fetch('http://103.82.92.95:1337/api/pengaturan-global?populate=*', {
+      cache: 'no-store' 
+    });
+    
+    if (!res.ok) {
+      console.error("Gagal mengambil data Pengaturan Global");
+      return null;
+    }
+    
+    const json = await res.json();
+    return json.data;
+  } catch (error) {
+    console.error("Error fetching pengaturan global:", error);
     return null;
   }
-  
-  const json = await res.json();
-  return json.data;
 }
 
 export async function getBeranda() {

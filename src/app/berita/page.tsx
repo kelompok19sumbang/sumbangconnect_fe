@@ -1,10 +1,11 @@
 // src/app/berita/page.tsx
-import { getBerita } from '@/lib/api';
+import { getBerita, getPengaturanGlobal } from '@/lib/api';
 import Link from 'next/link';
 import BlurText from '@/components/BlurText';
 
 export default async function BeritaPage() {
   const beritaData = await getBerita();
+  const globalSetting = await getPengaturanGlobal(); // Ambil data global dari Strapi
 
   const formatTanggal = (tanggal: string) => {
     if (!tanggal) return '';
@@ -27,32 +28,56 @@ export default async function BeritaPage() {
     }
   };
 
+  // Ambil gambar header berita dari Strapi (jika belum di-upload, pakai fallback Pexels)
+  let headerPath = '';
+  if (globalSetting?.header_berita?.url) {
+    headerPath = globalSetting.header_berita.url;
+  } else if (globalSetting?.header_berita?.data?.attributes?.url) {
+    headerPath = globalSetting.header_berita.data.attributes.url;
+  }
+
+  const headerBeritaUrl = headerPath 
+    ? getCleanPath(headerPath) 
+    : 'https://images.pexels.com/photos/3944454/pexels-photo-3944454.jpeg?auto=compress&cs=tinysrgb&w=1200';
+
   return (
     <main className="min-h-screen bg-cream font-sans pb-24">
       
-      {/* HEADER HALAMAN */}
-      <div className="w-full bg-gradient-to-br from-navy via-blue-primary to-blue-cyan relative overflow-hidden pt-32 pb-24 rounded-b-[4rem] shadow-xl mb-16">
-        <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none z-0"></div>
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[100%] bg-blue-light/20 blur-[120px] rounded-full pointer-events-none z-0"></div>
+      {/* ================= HEADER HALAMAN BERITA ================= */}
+      <section className="relative w-full min-h-[60vh] flex flex-col justify-center overflow-hidden z-30 mb-16 rounded-b-[3rem] shadow-2xl">
+        
+        {/* Background Image & Overlay */}
+        <div className="absolute inset-0 z-0 bg-navy">
+          <img
+            src={headerBeritaUrl} 
+            alt="Berita Kelurahan Sumbang"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-navy/60 via-navy/80 to-blue-primary/95 mix-blend-multiply"></div>
+        </div>
 
-        <div className="max-w-7xl mx-auto px-6 text-center relative z-10 animate-fade-up mt-8">
-          <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest bg-accent text-navy mb-6 shadow-sm border border-accent/20">
+        {/* Konten Teks Utama */}
+        <div className="relative z-10 flex flex-col justify-center max-w-7xl mx-auto w-full px-6 lg:px-8 pt-32 pb-16 animate-fade-up text-left">
+          
+          <p className="text-accent text-sm md:text-base font-bold mb-3 md:mb-4 tracking-widest uppercase flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
             Kabar Terbaru
-          </span>
-          <div className="mb-6 flex justify-center">
-            <BlurText 
-              text="Berita Kelurahan Sumbang" 
-              delay={100} 
-              animateBy="words" 
-              direction="bottom" 
-              className="text-4xl md:text-5xl font-bold text-white font-serif tracking-tight" 
-            />
-          </div>
-          <p className="text-white/80 max-w-2xl mx-auto text-lg leading-relaxed font-light">
+          </p>
+          
+          <BlurText 
+            text="Berita Kelurahan Sumbang"
+            delay={50} 
+            animateBy="words" 
+            direction="top" 
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-md whitespace-pre-line"
+          />
+          
+          <p className="text-white/90 text-lg md:text-xl max-w-2xl mt-2 drop-shadow-sm leading-relaxed">
             Ikuti perkembangan terkini, pengumuman resmi, dan berbagai kegiatan kemasyarakatan di lingkungan Kelurahan Sumbang.
           </p>
+          
         </div>
-      </div>
+      </section>
 
       {/* GRID KARTU BERITA */}
       <div className="max-w-7xl mx-auto px-6 relative z-20">

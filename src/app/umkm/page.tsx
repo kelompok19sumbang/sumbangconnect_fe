@@ -1,49 +1,74 @@
 // src/app/umkm/page.tsx
-import { getUmkm } from '@/lib/api';
+import { getUmkm, getPengaturanGlobal } from '@/lib/api';
 import Catalog from '@/components/Catalog';
-import TextType from '@/components/TextType';
 import GradualBlur from '@/components/GradualBlur';
 import BlurText from '@/components/BlurText';
 
 export default async function UmkmPage() {
   const data = await getUmkm();
+  const globalSetting = await getPengaturanGlobal(); // Ambil data global dari Strapi
+
+  // Fungsi pembersih path agar lolos dari blokir HTTPS Vercel
+  const getCleanPath = (url: string) => {
+    if (!url) return '';
+    try {
+      const parsed = new URL(url);
+      return parsed.pathname;
+    } catch {
+      return url.startsWith('/') ? url : `/${url}`; 
+    }
+  };
+
+  // Ambil gambar header UMKM dari Strapi (jika belum di-upload, pakai fallback Pexels)
+  let headerPath = '';
+  if (globalSetting?.header_umkm?.url) {
+    headerPath = globalSetting.header_umkm.url;
+  } else if (globalSetting?.header_umkm?.data?.attributes?.url) {
+    headerPath = globalSetting.header_umkm.data.attributes.url;
+  }
+
+  const headerUmkmUrl = headerPath 
+    ? getCleanPath(headerPath) 
+    : 'https://images.pexels.com/photos/5408929/pexels-photo-5408929.jpeg?auto=compress&cs=tinysrgb&w=1200';
 
   return (
-    // Background tetap menggunakan cream (yang sudah kita set ke warna putih bersih di globals.css)
-    <main className="min-h-screen bg-cream font-sans pt-32 pb-40 relative">
+    <main className="min-h-screen bg-cream font-sans pb-40 relative">
       
-      {/* ================= HEADER HALAMAN ================= */}
-      <div className="max-w-7xl mx-auto px-6 text-center mb-12 relative z-10 animate-fade-up">
-        {/* Ubah text-terracotta menjadi text-blue-primary agar terbaca jelas dan senada */}
-        <p className="text-blue-primary font-bold uppercase tracking-widest text-sm mb-3">
-          Direktori Lokal Kelurahan
-        </p>
+      {/* ================= HEADER HALAMAN UMKM ================= */}
+      <section className="relative w-full min-h-[60vh] flex flex-col justify-center overflow-hidden z-30 mb-16 rounded-b-[3rem] shadow-2xl">
         
-        {/* Judul UMKM dengan Efek BlurText */}
-        <div className="mb-6 flex justify-center">
+        {/* Background Image & Overlay */}
+        <div className="absolute inset-0 z-0 bg-navy">
+          <img
+            src={headerUmkmUrl} 
+            alt="Katalog UMKM Kelurahan Sumbang"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-navy/60 via-navy/80 to-blue-primary/95 mix-blend-multiply"></div>
+        </div>
+
+        {/* Konten Teks Utama */}
+        <div className="relative z-10 flex flex-col justify-center max-w-7xl mx-auto w-full px-6 lg:px-8 pt-32 pb-16 animate-fade-up text-left">
+          
+          <p className="text-accent text-sm md:text-base font-bold mb-3 md:mb-4 tracking-widest uppercase flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+            Potensi Ekonomi Warga
+          </p>
+          
           <BlurText 
-            text="Katalog UMKM Sumbang" 
+            text="Katalog UMKM\nSumbang"
             delay={50} 
             animateBy="words" 
-            direction="bottom" 
-            // Ubah text-dark menjadi text-navy
-            className="text-4xl md:text-5xl font-bold text-navy font-serif" 
+            direction="top" 
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-md whitespace-pre-line"
           />
+          
+          <p className="text-white/90 text-lg md:text-xl max-w-2xl mt-2 drop-shadow-sm leading-relaxed">
+            Jelajahi berbagai produk unggulan, kuliner lezat, dan jasa dari warga Kelurahan Sumbang. Dukung ekonomi lokal untuk Sumbang yang lebih digdaya!
+          </p>
+          
         </div>
-        
-        {/* Efek Mesin Tik */}
-        {/* Ubah text-dark/70 menjadi text-navy/70 */}
-        <div className="text-navy/70 max-w-2xl mx-auto min-h-[4rem]">
-          <TextType 
-            text="Dukung pertumbuhan ekonomi lokal dengan menjelajahi dan berbelanja di berbagai usaha mikro, kecil, dan menengah milik warga Kelurahan Sumbang."
-            typingSpeed={30}
-            loop={false}
-            showCursor={true}
-            cursorCharacter="_"
-            initialDelay={500}
-          />
-        </div>
-      </div>
+      </section>
 
       {/* ================= KOMPONEN KATALOG ================= */}
       <div className="animate-fade-up" style={{ animationDelay: '0.2s' }}>
@@ -51,7 +76,6 @@ export default async function UmkmPage() {
       </div>
 
       {/* ================= PERFECT GRADUAL BLUR ================= */}
-      {/* Diletakkan DI LUAR efek animasi agar posisinya benar-benar fixed di layar */}
       <div className="fixed inset-x-0 bottom-0 z-50 pointer-events-none">
         <GradualBlur
           target="parent"

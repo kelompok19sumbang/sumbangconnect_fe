@@ -16,6 +16,17 @@ export default async function BeritaPage() {
     }).format(date);
   };
 
+  // 🔥 Fungsi Pembersih URL (Biar Vercel yang ngambilin gambarnya lewat proxy next.config.ts)
+  const getCleanPath = (url: string) => {
+    if (!url) return '';
+    try {
+      const parsed = new URL(url);
+      return parsed.pathname; // Mengambil '/uploads/gambar.jpg' saja
+    } catch {
+      return url.startsWith('/') ? url : `/${url}`; 
+    }
+  };
+
   return (
     <main className="min-h-screen bg-cream font-sans pb-24">
       
@@ -48,12 +59,20 @@ export default async function BeritaPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {beritaData.length > 0 ? (
             beritaData.map((item: any) => {
-              // Ambil URL dari environment variable (kalau tidak ada, pakai IP VPS sebagai cadangan)
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95';
+              
+              // 1. Ambil path gambar anti-badai
+              let thumbPath = '';
+              if (item.thumbnail?.data?.attributes?.url) {
+                thumbPath = item.thumbnail.data.attributes.url;
+              } else if (item.thumbnail?.url) {
+                thumbPath = item.thumbnail.url;
+              }
 
-const thumbnailUrl = item.thumbnail?.url 
-  ? `${STRAPI_URL}${item.thumbnail.url}` 
-  : 'https://via.placeholder.com/600x400?text=SumbangConnect';
+              // 2. Bersihkan URL (Hapus IP HTTP biar lolos di Vercel)
+              const thumbnailUrl = thumbPath 
+                ? getCleanPath(thumbPath) 
+                : 'https://via.placeholder.com/600x400?text=SumbangConnect';
+
               // LOGIKA EXTERNAL LINK
               const isExternal = !!item.link_external;
               const targetUrl = isExternal ? item.link_external : `/berita/${item.slug}`;

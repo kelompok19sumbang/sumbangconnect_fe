@@ -56,7 +56,7 @@ export default async function UmkmPage() {
           </p>
           
           <BlurText 
-            text="Katalog UMKM\nSumbang"
+            text="Katalog UMKM Sumbang"
             delay={50} 
             animateBy="words" 
             direction="top" 

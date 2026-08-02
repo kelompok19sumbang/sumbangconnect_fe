@@ -8,7 +8,8 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         {
           source: '/uploads/:path*',
-          destination: 'http://103.82.92.95/uploads/:path*',
+          // 🔥 FIX: Tambahkan port :1337 di sini!
+          destination: 'http://103.82.92.95:1337/uploads/:path*',
         },
       ],
     };

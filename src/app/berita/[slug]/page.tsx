@@ -23,10 +23,19 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
      redirect(artikel.link_external);
   }
 
-  // URL Dasar Server (Gunakan IP VPS kamu)
-  const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95';
+  // 🔥 Fungsi Pembersih URL (Membuang IP/HTTP agar diurus oleh next.config.ts)
+  const getCleanPath = (url: string) => {
+    if (!url) return '';
+    try {
+      const parsed = new URL(url);
+      return parsed.pathname; // Mengambil '/uploads/gambar.jpg' saja
+    } catch {
+      // Jika url aslinya sudah berupa relative path
+      return url.startsWith('/') ? url : `/${url}`; 
+    }
+  };
 
- // 1. Render Thumbnail Anti-Badai
+  // 1. Render Thumbnail
   let thumbPath = '';
   if (artikel.thumbnail?.data?.attributes?.url) {
     thumbPath = artikel.thumbnail.data.attributes.url;
@@ -34,10 +43,9 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
     thumbPath = artikel.thumbnail.url;
   }
 
-  // 🔥 FIX: Pakai corsproxy.io yang bebas blokir IP Address
-  const fullThumbUrl = thumbPath ? `${STRAPI_URL}${thumbPath}` : '';
-  const thumbnailUrl = fullThumbUrl
-    ? `https://corsproxy.io/?${encodeURIComponent(fullThumbUrl)}`
+  // Vercel akan membaca ini sebagai /uploads/... dan memprosesnya via rewrites
+  const thumbnailUrl = thumbPath 
+    ? getCleanPath(thumbPath)
     : 'https://via.placeholder.com/1200x800?text=Belum+Ada+Gambar';
 
   const thumbnailCaption = artikel.thumbnail?.caption || artikel.thumbnail?.alternativeText || `Dokumentasi Liputan: ${artikel.judul}`;
@@ -90,7 +98,7 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
         );
       }
 
-     // ✅ 4. Render GAMBAR SISIPAN DI TENGAH TEKS
+      // ✅ 4. Render GAMBAR SISIPAN DI TENGAH TEKS
       if (block.type === 'image') {
         
         let blockImgPath = '';
@@ -100,11 +108,8 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
           blockImgPath = block.image.url;
         }
 
-        // 🔥 FIX: Pakai corsproxy.io untuk gambar sisipan juga
-        const fullInnerUrl = blockImgPath ? `${STRAPI_URL}${blockImgPath}` : '';
-        const imgUrl = fullInnerUrl 
-          ? `https://corsproxy.io/?${encodeURIComponent(fullInnerUrl)}` 
-          : '';
+        // Terapkan fungsi pembersih yang sama
+        const imgUrl = blockImgPath ? getCleanPath(blockImgPath) : '';
           
         const imgAlt = block.image?.alternativeText || `Ilustrasi ${artikel.judul}`;
         const imgCaption = block.image?.caption;
@@ -201,12 +206,11 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
       <div className="max-w-3xl mx-auto px-6 relative z-10">
         <div className="bg-white p-8 md:p-12 rounded-[3rem] shadow-xl shadow-navy/5 border border-navy/10">
           
-          {/* Ini area dimana teks dan gambar sisipan akan di-render */}
           <article className="prose prose-lg prose-navy max-w-none">
             {renderBlocks(artikel.konten)}
           </article>
 
-          {/* GALERI TAMBAHAN (Tetap dipertahankan jika admin masih mau numpuk foto di bawah) */}
+          {/* GALERI TAMBAHAN */}
           {artikel.galeri_foto && artikel.galeri_foto.length > 0 && (
             <div className="mt-16 pt-10 border-t border-navy/10">
               <h3 className="text-2xl font-serif font-bold text-navy mb-6">

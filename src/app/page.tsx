@@ -223,7 +223,7 @@ export default async function Home() {
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-serif font-bold text-navy">Visi & Misi</h2>
-            <p className="text-navy/60 mt-4 max-w-2xl mx-auto">Landasan utama pergerakan Kelurahan Sumbang dalam mewujudkan lingkungan yang asri, aman, dan berdaya saing.</p>
+            <p className="text-navy/60 mt-4 max-w-2xl mx-auto"></p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white p-10 rounded-3xl shadow-sm border border-navy/10 hover:shadow-lg transition-shadow">

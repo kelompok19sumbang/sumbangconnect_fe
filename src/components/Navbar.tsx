@@ -3,7 +3,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
@@ -25,19 +24,32 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           
-          {/* Logo Brand */}
-          <Link href="/" className="flex items-center gap-3 flex-shrink-0 hover:opacity-90 transition-opacity">
-            <Image 
+          {/* ================= BAGIAN LOGO NAVBAR ================= */}
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
+            
+            {/* 1. Logo Pemkab Bojonegoro (Transparan) */}
+            <img 
+              src="/logo-pemkabbjn.png" 
+              alt="Logo Pemkab Bojonegoro" 
+              className="h-9 sm:h-11 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
+            />
+
+            {/* Garis Pemisah Estetik */}
+            <div className="h-7 w-px bg-white/30 hidden sm:block mx-0.5"></div>
+
+            {/* 2. Logo Sumbang Digdaya (Transparan) */}
+            <img  
               src="/logo-sumbang.png" 
               alt="Logo Sumbang Digdaya" 
-              width={48} 
-              height={48}
-              className="h-10 w-auto object-contain bg-white/95 px-2 py-1 rounded-xl"
-              priority 
+              // 🔥 FIX: h-9 sm:h-11 dinaikkan jadi h-10 sm:h-14 biar lebih besar dan seimbang
+              className="h-10 sm:h-14 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
             />
-            <span className="font-serif text-2xl font-bold tracking-tight text-white hidden sm:block">
+
+            {/* 3. Teks Brand */}
+            <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-white hidden md:block ml-1 group-hover:opacity-90 transition-opacity">
               Sumbang<span className="text-accent font-sans">Connect.</span>
             </span>
+            
           </Link>
 
           {/* Desktop Menu */}
@@ -47,7 +59,7 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 className={`text-[13px] xl:text-sm font-medium transition-all whitespace-nowrap ${
-                  pathname === link.href
+                  pathname === link.href  
                     ? 'text-accent border-b-2 border-accent pb-1'
                     : 'text-cream/70 hover:text-white'
                 }`}

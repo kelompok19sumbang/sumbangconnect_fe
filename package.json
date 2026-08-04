@@ -18,7 +18,9 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-leaflet": "^5.0.0",
-    "recharts": "^3.9.2"
+    "react-leaflet-custom-control": "^1.5.0",
+    "recharts": "^3.9.2",
+    "screenfull": "^6.0.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

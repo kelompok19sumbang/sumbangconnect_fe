@@ -3,12 +3,12 @@
 
 import dynamic from 'next/dynamic';
 
-// Import komponen peta ke dalam Client Component ini dengan ssr: false
 const MapInteraktif = dynamic(() => import('./MapInteraktif'), {
   ssr: false,
   loading: () => (
-    <div className="h-[600px] w-full bg-forest/10 animate-pulse rounded-[2rem] flex items-center justify-center font-bold text-forest">
-      Memuat Peta Interaktif...
+    // Tailwind warning fixed: rounded-[2rem] -> rounded-4xl
+    <div className="h-[75vh] w-full bg-forest/10 animate-pulse rounded-4xl flex items-center justify-center font-bold text-forest shadow-inner">
+      Memuat Peta Satelit Interaktif...
     </div>
   )
 });

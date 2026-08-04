@@ -4,21 +4,41 @@ import { getBeranda, getUmkm, getProfilDesa, getInfografis } from '@/lib/api';
 import BlurText from '@/components/BlurText';
 import CurvedLoop from '@/components/CurvedLoop';
 import ScrollReveal from '@/components/ScrollReveal';
-import ImageSlider from '@/components/ImageSlider';
+
+// 🔥 IMPORT KOMPONEN BARU KITA
+import ExpandableHistory from '@/components/ExpandableHistory';
+import OrgChart from '@/components/OrgChart';
+
+// Fungsi Fetcher Khusus untuk Perangkat Desa
+async function getPerangkatDesa() {
+  try {
+    // Kalau di local otomatis pakai localhost:1337, kalau di Vercel otomatis pakai VPS 103.82.92.95
+    const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95:1337';
+    
+    // Perhatikan kita pakai perangkat-desas (huruf s) dan populate=*
+    const res = await fetch(`${baseUrl}/api/perangkat-desas?populate=*&pagination[limit]=100`, {
+      cache: 'no-store'
+    });
+    
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json.data || [];
+  } catch (error) {
+    console.error("Gagal mengambil data perangkat desa:", error);
+    return [];
+  }
+}
 
 export default async function Home() {
   const beranda = await getBeranda();
-  
   const umkmData = await getUmkm();
   const profilData = await getProfilDesa();
-  
-  // ====== PASANG CCTV DI SINI ======
-  console.log("=== CEK DATA BERANDA DARI STRAPI ===");
-  console.log("Apakah ada isi foto struktur?", JSON.stringify(beranda?.foto_struktur_organisasi, null, 2));
-  // =================================
-
-  // Asumsi fungsi ini mengambil data dari Single Type "Statistik" sesuai screenshot
   const infografisData = await getInfografis(); 
+  
+  // Ambil Data Perangkat Desa
+  const rawPerangkatDesa = await getPerangkatDesa();
+  // 🔥 PASANG CCTV PERANGKAT DESA
+  console.log("=== DATA PERANGKAT DESA ===", JSON.stringify(rawPerangkatDesa, null, 2));
 
   const totalUmkm = umkmData ? umkmData.length : 0;
   
@@ -32,17 +52,46 @@ export default async function Home() {
       ? beranda.foto_hero.data.attributes.url
       : 'https://images.pexels.com/photos/209266/pexels-photo-209266.jpeg?auto=compress&cs=tinysrgb&w=1200';
 
-  // FIX: Tambahkan tipe any[] dan ambil datanya dari variabel 'beranda'
-  let strukturImages: any[] = [];
-
-  if (beranda?.foto_struktur_organisasi) {
-    if (beranda.foto_struktur_organisasi.data?.attributes?.url) {
-      strukturImages = [beranda.foto_struktur_organisasi.data.attributes];
-    } 
-    else if (beranda.foto_struktur_organisasi.url) {
-      strukturImages = [beranda.foto_struktur_organisasi];
+  // 🔥 Fungsi Pembersih URL (Biar Vercel yang ngambilin gambarnya lewat proxy next.config.ts)
+  const getCleanPath = (url: string) => {
+    if (!url) return '';
+    try {
+      const parsed = new URL(url);
+      return parsed.pathname; 
+    } catch {
+      return url.startsWith('/') ? url : `/${url}`; 
     }
-  }
+  };
+
+  // 🔥 Format Data Perangkat Desa agar sesuai dengan Props di OrgChart.tsx
+  const dataPerangkatDesa = rawPerangkatDesa.map((item: any) => {
+    // 1. Ambil path foto
+    let fotoUrl = '';
+    if (item.foto?.url) {
+      fotoUrl = item.foto.url;
+    } else if (item.foto?.data?.attributes?.url) {
+      fotoUrl = item.foto.data.attributes.url;
+    }
+
+    // 2. Parser Biografi (Karena formatnya Rich text / Blocks array)
+    let parsedBiografi = '';
+    if (Array.isArray(item.biografi)) {
+      parsedBiografi = item.biografi.map((block: any) => {
+        return block.children?.map((child: any) => child.text).join('') || '';
+      }).join('\n\n');
+    } else if (typeof item.biografi === 'string') {
+      parsedBiografi = item.biografi;
+    }
+
+    return {
+      id: item.documentId || item.id,
+      nama: item.nama || 'Tanpa Nama',
+      jabatan: item.jabatan || 'Staf',
+      biografi: parsedBiografi,
+      foto_url: fotoUrl ? getCleanPath(fotoUrl) : 'https://via.placeholder.com/400x400?text=Foto',
+      level: item.level || 3
+    };
+  });
 
   const renderScrollRevealContent = (content: any, fallbackText: string, rotation: number) => {
     if (Array.isArray(content) && content.length > 0) {
@@ -92,7 +141,7 @@ export default async function Home() {
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0 bg-navy">
           <img
-            src={fotoHeroUrl}
+            src={getCleanPath(fotoHeroUrl) || fotoHeroUrl}
             alt="Pemandangan Kelurahan Sumbang"
             className="w-full h-full object-cover object-center"
           />
@@ -131,21 +180,18 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* ================= BARIS STATISTIK (UPDATE DATA DARI SCREENSHOT) ================= */}
+        {/* ================= BARIS STATISTIK ================= */}
         <div className="relative z-10 bg-navy/80 backdrop-blur-md border-b-4 border-accent w-full py-6 md:py-8 mt-auto shadow-2xl">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 text-white text-left items-center">
               
-              {/* Stat 1: Populasi Total */}
               <div className="border-l-2 border-white/20 pl-4">
                 <h3 className="text-3xl md:text-5xl font-bold tracking-tight">
-                  {/* Gunakan toLocaleString agar ada titik ribuannya */}
                   {infografisData?.populasi_total?.toLocaleString('id-ID') || '5.036'}
                 </h3>
                 <p className="text-xs md:text-sm text-white/80 mt-1 font-medium">jiwa terdaftar</p>
               </div>
               
-              {/* Stat 2: Luas Total */}
               <div className="border-l-2 border-white/20 pl-4">
                 <h3 className="text-3xl md:text-5xl font-bold tracking-tight">
                   {infografisData?.luas_total || '192'}
@@ -153,9 +199,7 @@ export default async function Home() {
                 <p className="text-xs md:text-sm text-white/80 mt-1 font-medium">Ha luas wilayah</p>
               </div>
               
-              {/* Stat 3: RT & RW */}
               <div className="border-l-2 border-white/20 pl-4">
-                {/* Dibuat format: 29 RT / 7 RW biar lebih informatif */}
                 <h3 className="text-2xl md:text-3xl font-bold tracking-tight flex items-baseline gap-1.5 flex-wrap">
                   <span>{infografisData?.rt || '29'}</span>
                   <span className="text-sm md:text-base font-normal text-white/70">RT</span>
@@ -166,7 +210,6 @@ export default async function Home() {
                 <p className="text-xs md:text-sm text-white/80 mt-1 font-medium">lingkungan warga</p>
               </div>
               
-              {/* Stat 4: UMKM Terdaftar */}
               <div className="border-l-2 border-accent pl-4">
                 <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-accent">
                   {totalUmkm}
@@ -191,7 +234,7 @@ export default async function Home() {
           <div className="lg:col-span-5 relative flex justify-center">
             <div className="relative w-full max-w-[380px] aspect-[4/5] rounded-t-[150px] rounded-b-3xl overflow-hidden shadow-2xl border-4 border-white bg-gray-100">
               <img 
-                src={fotoLurahUrl} 
+                src={getCleanPath(fotoLurahUrl) || fotoLurahUrl} 
                 alt={beranda?.nama_lurah || 'Foto Lurah'} 
                 className="w-full h-full object-cover object-top" 
               />
@@ -223,7 +266,6 @@ export default async function Home() {
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-serif font-bold text-navy">Visi & Misi</h2>
-            <p className="text-navy/60 mt-4 max-w-2xl mx-auto"></p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white p-10 rounded-3xl shadow-sm border border-navy/10 hover:shadow-lg transition-shadow">
@@ -255,11 +297,14 @@ export default async function Home() {
               <div className="flex-1 h-px bg-navy/10 hidden sm:block"></div>
             </div>
             <div className="text-left">
-              {renderScrollRevealContent(
-                profilData?.sejarah_desa, 
-                "Data Sejarah belum ditambahkan di sistem.", 
-                2 
-              )}
+              {/* 🔥 KONTEN SEJARAH DIBUNGKUS EXPANDABLE HISTORY */}
+              <ExpandableHistory>
+                {renderScrollRevealContent(
+                  profilData?.sejarah_desa, 
+                  "Data Sejarah belum ditambahkan di sistem.", 
+                  2 
+                )}
+              </ExpandableHistory>
             </div>
           </div>
 
@@ -272,7 +317,7 @@ export default async function Home() {
             <div className="text-left">
               {renderScrollRevealContent(
                 profilData?.geografi, 
-                "Secara topografi, Kelurahan Sumbang terletak di dataran rendah yang strategis, menjadikannya salah satu urat nadi aktivitas masyarakat perkotaan.", 
+                "Secara topografi, Kelurahan Sumbang terletak di dataran rendah yang strategis.", 
                 -2 
               )}
             </div>
@@ -287,12 +332,34 @@ export default async function Home() {
             <div className="text-left">
               {renderScrollRevealContent(
                 profilData?.demografi, 
-                "Masyarakat Kelurahan Sumbang adalah representasi dari dinamika sosial masyarakat urban yang majemuk namun tetap menjunjung tinggi nilai gotong royong.", 
+                "Masyarakat Kelurahan Sumbang menjunjung tinggi nilai gotong royong.", 
                 2 
               )}
             </div>
           </div>
 
+        </div>
+      </section>
+
+      {/* ================= SECTION: STRUKTUR ORGANISASI ================= */}
+      <section className="py-24 px-6 lg:px-8 bg-cream border-t border-navy/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="text-blue-primary font-bold uppercase tracking-widest text-sm mb-3 block">Perangkat Desa</span>
+            <h2 className="text-4xl font-serif font-bold text-navy">Struktur Organisasi</h2>
+            <p className="text-navy/60 mt-4 max-w-2xl mx-auto">Klik pada foto perangkat kelurahan untuk melihat profil dan biografi singkat.</p>
+          </div>
+          
+          <div className="w-full bg-white rounded-[2rem] md:rounded-[3rem] shadow-xl shadow-navy/5 border border-navy/10 p-6">
+            {/* 🔥 PANGGIL KOMPONEN ORG CHART DENGAN DATA DARI STRAPI */}
+            {dataPerangkatDesa.length > 0 ? (
+              <OrgChart data={dataPerangkatDesa} />
+            ) : (
+              <div className="w-full h-[40vh] flex items-center justify-center text-navy/40 font-medium">
+                Data Perangkat Kelurahan belum ditambahkan.
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
@@ -354,28 +421,6 @@ export default async function Home() {
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-navy/40">
                   <p className="font-medium tracking-wide">Link Peta belum ditambahkan</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= SECTION: STRUKTUR ORGANISASI ================= */}
-      <section className="py-24 px-6 lg:px-8 bg-cream">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <span className="text-blue-primary font-bold uppercase tracking-widest text-sm mb-3 block">Perangkat Desa</span>
-            <h2 className="text-4xl font-serif font-bold text-navy">Struktur Organisasi</h2>
-          </div>
-          
-          <div className="bg-white p-4 rounded-[2rem] md:rounded-[3rem] shadow-xl shadow-navy/5 border border-navy/10">
-            <div className="w-full h-[60vh] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-navy/5 cursor-zoom-in">
-              {strukturImages.length > 0 ? (
-                <ImageSlider images={strukturImages} altPrefix="Struktur Organisasi" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-navy/40 font-medium">
-                  Gambar Struktur Organisasi belum diunggah.
                 </div>
               )}
             </div>

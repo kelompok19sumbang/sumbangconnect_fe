@@ -57,14 +57,20 @@ export default async function Infografis() {
     { name: 'Petani/Pekebun', jumlah: 39 },
   ];
 
-  // ✅ TAMBAHAN DATA KESEHATAN (Diambil dari Strapi)
+// ✅ KESEHATAN UPDATE: Fokus isu krusial + Penyakit Kronis & Mematikan
   const dataKesehatan = [
-    { name: 'ISPA', jumlah: data.penyakit_ispa || 0 },
-    { name: 'Hipertensi', jumlah: data.penyakit_hipertensi || 0 },
-    { name: 'Diabetes', jumlah: data.penyakit_diabetes || 0 },
-    { name: 'Diare', jumlah: data.penyakit_diare || 0 },
-    { name: 'Demam Berdarah (DBD)', jumlah: data.penyakit_dbd || 0 },
-    { name: 'Kasus Stunting', jumlah: data.stunting || 0 },
+    // Penyakit Umum / Dasar (Tanpa Alert)
+    { name: 'TBC', jumlah: data.penyakit_tbc || 0, isAlert: false },
+    { name: 'Demam Berdarah (DBD)', jumlah: data.penyakit_dbd || 0, isAlert: false },
+    { name: 'Kasus Stunting', jumlah: data.stunting || 0, isAlert: false },
+    { name: 'Diabetes Melitus', jumlah: data.penyakit_diabetes || 0, isAlert: false },
+    
+    // Penyakit Kronis / Berbahaya / Menular (Dengan Alert Merah)
+    { name: 'Serangan Jantung', jumlah: data.penyakit_jantung || 0, isAlert: true },
+    { name: 'Stroke', jumlah: data.penyakit_stroke || 0, isAlert: true },
+    { name: 'HIV / AIDS', jumlah: data.penyakit_hiv || 0, isAlert: true },
+    { name: 'Leptospirosis', jumlah: data.penyakit_leptospirosis || 0, isAlert: true },
+    { name: 'Difteri', jumlah: data.penyakit_difteri || 0, isAlert: true },
   ];
 
   return (
@@ -92,9 +98,7 @@ export default async function Infografis() {
         {/* ================================================================= */}
 
         <div className="max-w-4xl mx-auto text-center relative z-10 animate-fade-up">
-          <span className="inline-block px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-widest bg-accent text-navy mb-6 shadow-sm border border-accent/20">
-            BPS Bojonegoro 2025
-          </span>
+        
           <div className="flex flex-wrap justify-center items-center gap-x-3 mb-6">
             <BlurText 
               text="Infografis" 
@@ -104,7 +108,7 @@ export default async function Infografis() {
               className="text-5xl md:text-7xl font-serif font-bold tracking-tight text-white" 
             />
             <BlurText 
-              text="Desa" 
+              text="Kelurahan" 
               delay={200} 
               animateBy="words" 
               direction="bottom" 
@@ -267,15 +271,31 @@ export default async function Infografis() {
           </div>
         </div>
 
-        {/* ✅ BAGIAN KESEHATAN (BARU) */}
+       {/* ✅ BAGIAN KESEHATAN (UPDATE KHUSUS) */}
         <div className="mb-8">
-          <h2 className="text-3xl font-serif font-bold text-navy mb-8">Data Kesehatan Masyarakat</h2>
+          <h2 className="text-3xl font-serif font-bold text-navy mb-8">Data Kesehatan & Peringatan Dini</h2>
+          
+          {/* Grid md:grid-cols-3 agar 9 data terbagi rata jadi 3 baris yang rapi */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {dataKesehatan.map((penyakit, idx) => (
               <div key={idx} className="bg-white p-6 rounded-2xl border border-navy/10 shadow-sm hover:shadow-xl hover:shadow-navy/15 hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group cursor-default">
-                {/* Aksen warna sedikit berbeda (menggunakan accent/kuning) agar terlihat fresh tapi tetap senada */}
-                <div className="absolute top-0 left-0 w-1 h-full bg-accent/50 group-hover:bg-accent transition-colors"></div>
-                <h3 className="text-sm font-bold text-navy/60 mb-4">{penyakit.name}</h3>
+                
+                {/* Efek Garis Samping (Merah jika isAlert true, Kuning/Accent jika false) */}
+                <div className={`absolute top-0 left-0 w-1 h-full transition-colors ${
+                  penyakit.isAlert ? 'bg-red-500/50 group-hover:bg-red-500' : 'bg-accent/50 group-hover:bg-accent'
+                }`}></div>
+                
+                <h3 className="text-sm font-bold text-navy/60 mb-4 flex items-center justify-between">
+                  {penyakit.name}
+                  {/* Efek Radar Merah Berkedip */}
+                  {penyakit.isAlert && (
+                    <span className="flex h-2.5 w-2.5 relative" title="Risiko Tinggi / Perlu Kewaspadaan">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                    </span>
+                  )}
+                </h3>
+                
                 <p className="text-4xl font-serif font-bold bg-gradient-to-br from-navy to-blue-primary bg-clip-text text-transparent group-hover:from-blue-primary group-hover:to-blue-cyan transition-colors duration-300">
                   <CountUp from={0} to={penyakit.jumlah} separator="." duration={1.5} delay={0.2 + (idx * 0.1)} />
                 </p>

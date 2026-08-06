@@ -21,11 +21,12 @@ export default function Navbar() {
 
   return (
     <nav className="bg-navy text-cream sticky top-0 z-50 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 xl:px-8">
         <div className="flex justify-between h-20 items-center">
           
           {/* ================= BAGIAN LOGO NAVBAR ================= */}
-          <Link href="/" className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
+          {/* 🔥 Diberi w-fit agar tidak melebar dan menekan menu sebelah kanan */}
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0 group w-fit">
             
             {/* 1. Logo Pemkab Bojonegoro (Transparan) */}
             <img 
@@ -41,24 +42,24 @@ export default function Navbar() {
             <img  
               src="/logo-sumbang.png" 
               alt="Logo Sumbang Digdaya" 
-              // 🔥 FIX: h-9 sm:h-11 dinaikkan jadi h-10 sm:h-14 biar lebih besar dan seimbang
               className="h-10 sm:h-14 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
             />
 
             {/* 3. Teks Brand */}
-            <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-white hidden md:block ml-1 group-hover:opacity-90 transition-opacity">
+            <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-white hidden md:block ml-1 group-hover:opacity-90 transition-opacity whitespace-nowrap">
               Sumbang<span className="text-accent font-sans">Connect.</span>
             </span>
             
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden lg:flex lg:items-center gap-3 xl:gap-5">
+          {/* 🔥 Ditambahkan ml-auto untuk dorong menu mentok ke kanan */}
+          <div className="hidden lg:flex lg:items-center gap-3 xl:gap-5 ml-auto pl-8">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className={`text-[13px] xl:text-sm font-medium transition-all whitespace-nowrap ${
+                className={`text-[12px] xl:text-sm font-medium transition-all whitespace-nowrap ${
                   pathname === link.href  
                     ? 'text-accent border-b-2 border-accent pb-1'
                     : 'text-cream/70 hover:text-white'
@@ -67,7 +68,7 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <Link href="/hubungi-kami" className="bg-accent text-navy px-5 py-2.5 ml-2 rounded-full text-[13px] xl:text-sm font-bold hover:bg-white hover:text-navy transition-colors whitespace-nowrap shadow-sm">
+            <Link href="/hubungi-kami" className="bg-accent text-navy px-5 py-2.5 ml-2 rounded-full text-[13px] xl:text-sm font-bold hover:bg-white hover:text-navy transition-colors whitespace-nowrap shadow-sm shrink-0">
               Hubungi Kami
             </Link>
           </div>

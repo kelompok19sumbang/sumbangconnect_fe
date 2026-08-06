@@ -3,7 +3,6 @@ import { getInfografis } from '@/lib/api';
 import { PendidikanChart } from '@/components/DataCharts';
 import CountUp from '@/components/CountUp';
 import AnimatedBar from '@/components/AnimatedBar';
-
 import BlurText from '@/components/BlurText';
 
 export default async function Infografis() {
@@ -57,21 +56,54 @@ export default async function Infografis() {
     { name: 'Petani/Pekebun', jumlah: 39 },
   ];
 
-// ✅ KESEHATAN UPDATE: Fokus isu krusial + Penyakit Kronis & Mematikan
+  // ✅ DATA KESEHATAN
   const dataKesehatan = [
-    // Penyakit Umum / Dasar (Tanpa Alert)
     { name: 'TBC', jumlah: data.penyakit_tbc || 0, isAlert: false },
     { name: 'Demam Berdarah (DBD)', jumlah: data.penyakit_dbd || 0, isAlert: false },
     { name: 'Kasus Stunting', jumlah: data.stunting || 0, isAlert: false },
     { name: 'Diabetes Melitus', jumlah: data.penyakit_diabetes || 0, isAlert: false },
-    
-    // Penyakit Kronis / Berbahaya / Menular (Dengan Alert Merah)
     { name: 'Serangan Jantung', jumlah: data.penyakit_jantung || 0, isAlert: true },
     { name: 'Stroke', jumlah: data.penyakit_stroke || 0, isAlert: true },
     { name: 'HIV / AIDS', jumlah: data.penyakit_hiv || 0, isAlert: true },
     { name: 'Leptospirosis', jumlah: data.penyakit_leptospirosis || 0, isAlert: true },
     { name: 'Difteri', jumlah: data.penyakit_difteri || 0, isAlert: true },
   ];
+
+  // 🔥 DATA PENDUDUK PER RT (Contoh 10 RT, tambahkan jika RT lebih banyak)
+  // Tarik dari Strapi (data.penduduk_rt_01 dll). Kalau kosong, pakai angka cadangan.
+// 🔥 DATA PENDUDUK 29 RT
+  const dataRT = [
+    { name: 'RT 01', jumlah: data.penduduk_rt_01 || 0 },
+    { name: 'RT 02', jumlah: data.penduduk_rt_02 || 0 },
+    { name: 'RT 03', jumlah: data.penduduk_rt_03 || 0 },
+    { name: 'RT 04', jumlah: data.penduduk_rt_04 || 0 },
+    { name: 'RT 05', jumlah: data.penduduk_rt_05 || 0 },
+    { name: 'RT 06', jumlah: data.penduduk_rt_06 || 0 },
+    { name: 'RT 07', jumlah: data.penduduk_rt_07 || 0 },
+    { name: 'RT 08', jumlah: data.penduduk_rt_08 || 0 },
+    { name: 'RT 09', jumlah: data.penduduk_rt_09 || 0 },
+    { name: 'RT 10', jumlah: data.penduduk_rt_10 || 0 },
+    { name: 'RT 11', jumlah: data.penduduk_rt_11 || 0 },
+    { name: 'RT 12', jumlah: data.penduduk_rt_12 || 0 },
+    { name: 'RT 13', jumlah: data.penduduk_rt_13 || 0 },
+    { name: 'RT 14', jumlah: data.penduduk_rt_14 || 0 },
+    { name: 'RT 15', jumlah: data.penduduk_rt_15 || 0 },
+    { name: 'RT 16', jumlah: data.penduduk_rt_16 || 0 },
+    { name: 'RT 17', jumlah: data.penduduk_rt_17 || 0 },
+    { name: 'RT 18', jumlah: data.penduduk_rt_18 || 0 },
+    { name: 'RT 19', jumlah: data.penduduk_rt_19 || 0 },
+    { name: 'RT 20', jumlah: data.penduduk_rt_20 || 0 },
+    { name: 'RT 21', jumlah: data.penduduk_rt_21 || 0 },
+    { name: 'RT 22', jumlah: data.penduduk_rt_22 || 0 },
+    { name: 'RT 23', jumlah: data.penduduk_rt_23 || 0 },
+    { name: 'RT 24', jumlah: data.penduduk_rt_24 || 0 },
+    { name: 'RT 25', jumlah: data.penduduk_rt_25 || 0 },
+    { name: 'RT 26', jumlah: data.penduduk_rt_26 || 0 },
+    { name: 'RT 27', jumlah: data.penduduk_rt_27 || 0 },
+    { name: 'RT 28', jumlah: data.penduduk_rt_28 || 0 },
+    { name: 'RT 29', jumlah: data.penduduk_rt_29 || 0 },
+  ];
+  const maxPendudukRT = Math.max(...dataRT.map(r => r.jumlah), 1);
 
   return (
     <main className="min-h-screen bg-cream font-sans pb-32">
@@ -123,7 +155,7 @@ export default async function Infografis() {
 
       <div className="max-w-7xl mx-auto px-6 -mt-16 relative z-20">
         
-        {/* 4 Highlight Cards dengan Hover Lift & Gradient Text */}
+        {/* 4 Highlight Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
           <div className="bg-white p-6 rounded-3xl shadow-xl shadow-navy/5 border border-navy/10 text-center flex flex-col justify-center hover:-translate-y-2 hover:shadow-2xl hover:shadow-navy/15 transition-all duration-300 animate-fade-up group" style={{animationDelay: '0.1s'}}>
             <span className="text-navy/50 text-sm font-bold uppercase tracking-wider mb-2">Total Penduduk</span>
@@ -220,7 +252,36 @@ export default async function Infografis() {
           </div>
         </div>
 
-        {/* Demografi Usia dengan Komponen Animasi */}
+        {/* 🔥 TAMBAHAN BARU: SEBARAN PENDUDUK PER RT 🔥 */}
+        <div className="bg-white p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-navy/5 border border-navy/10 mb-16 hover:shadow-navy/10 transition-shadow duration-300">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4 border-b border-navy/10 pb-6">
+            <div>
+              <span className="text-blue-primary font-bold uppercase tracking-widest text-sm mb-2 block">Pemetaan Wilayah</span>
+              <h2 className="text-3xl font-serif font-bold text-navy">Sebaran Penduduk per RT</h2>
+            </div>
+            <p className="text-navy/50 font-medium text-sm text-right">Data diukur dalam satuan Jiwa</p>
+          </div>
+
+          {/* Menggunakan format 2 Kolom (Grid) agar menghemat tempat */}
+          <div className="grid md:grid-cols-2 gap-x-12 gap-y-5">
+            {dataRT.map((item, idx) => (
+              <div key={idx} className="flex items-center gap-4 group">
+                <div className="w-16 text-right text-sm font-bold text-navy/60 group-hover:text-navy transition-colors">
+                  {item.name}
+                </div>
+                <div className="flex-1 h-8 bg-navy/5 rounded-r-xl overflow-hidden relative border border-navy/10 shadow-inner">
+                  <AnimatedBar 
+                    widthPercent={(item.jumlah / maxPendudukRT) * 100} 
+                    value={item.jumlah} 
+                    delay={0.1 + (idx * 0.05)} 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Demografi Usia */}
         <div className="bg-white p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-navy/5 border border-navy/10 mb-16 hover:shadow-navy/10 transition-shadow duration-300">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4 border-b border-navy/10 pb-6">
             <div>
@@ -271,23 +332,19 @@ export default async function Infografis() {
           </div>
         </div>
 
-       {/* ✅ BAGIAN KESEHATAN (UPDATE KHUSUS) */}
+       {/* ✅ BAGIAN KESEHATAN */}
         <div className="mb-8">
           <h2 className="text-3xl font-serif font-bold text-navy mb-8">Data Kesehatan & Peringatan Dini</h2>
-          
-          {/* Grid md:grid-cols-3 agar 9 data terbagi rata jadi 3 baris yang rapi */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {dataKesehatan.map((penyakit, idx) => (
               <div key={idx} className="bg-white p-6 rounded-2xl border border-navy/10 shadow-sm hover:shadow-xl hover:shadow-navy/15 hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group cursor-default">
                 
-                {/* Efek Garis Samping (Merah jika isAlert true, Kuning/Accent jika false) */}
                 <div className={`absolute top-0 left-0 w-1 h-full transition-colors ${
                   penyakit.isAlert ? 'bg-red-500/50 group-hover:bg-red-500' : 'bg-accent/50 group-hover:bg-accent'
                 }`}></div>
                 
                 <h3 className="text-sm font-bold text-navy/60 mb-4 flex items-center justify-between">
                   {penyakit.name}
-                  {/* Efek Radar Merah Berkedip */}
                   {penyakit.isAlert && (
                     <span className="flex h-2.5 w-2.5 relative" title="Risiko Tinggi / Perlu Kewaspadaan">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>

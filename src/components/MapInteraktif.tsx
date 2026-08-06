@@ -1,7 +1,7 @@
 // src/components/MapInteraktif.tsx
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import Control from 'react-leaflet-custom-control';
 import 'leaflet/dist/leaflet.css';
@@ -9,12 +9,14 @@ import L from 'leaflet';
 import Link from 'next/link';
 import screenfull from 'screenfull';
 
-// Fungsi Custom Pin (Kategori Gayatri & Tailwind Fixes)
+// Fungsi Custom Pin (Emotikon tetap dipertahankan HANYA untuk di dalam peta)
 const getCustomIcon = (kategori: string) => {
   let emoji = '📍';
   let bgColor = 'bg-navy'; 
   
-  switch (kategori) {
+  const safeKategori = kategori ? kategori.replace(/\s+/g, '_') : '';
+
+  switch (safeKategori) {
     case 'Posyandu': emoji = '🏥'; bgColor = 'bg-red-500'; break;
     case 'Sekolah': emoji = '🎓'; bgColor = 'bg-blue-600'; break;
     case 'Tempat_Ibadah': emoji = '🕌'; bgColor = 'bg-emerald-500'; break;
@@ -24,7 +26,9 @@ const getCustomIcon = (kategori: string) => {
     case 'Sarana_Olahraga': emoji = '⚽'; bgColor = 'bg-orange-500'; break;
     case 'Makam': emoji = '🕊️'; bgColor = 'bg-stone-500'; break;
     case 'UMKM': emoji = '🏪'; bgColor = 'bg-yellow-500'; break;
-    case 'Gayatri': emoji = '🐔'; bgColor = 'bg-[#84cc16] text-navy'; break; // 🔥 FIX: Diganti jadi emot ayam
+    // Kategori unggulan baru dengan emotikon yang benar
+    case 'Unggulan_Gayatri': emoji = '🐔'; bgColor = 'bg-[#84cc16] text-navy'; break; 
+    case 'Unggulan_Domba_Kesejahteraan': emoji = '🐑'; bgColor = 'bg-teal-500 text-white'; break;
     case 'Lainnya': emoji = '📍'; bgColor = 'bg-gray-500'; break;
     default: emoji = '📍'; bgColor = 'bg-navy'; break;
   }
@@ -57,7 +61,6 @@ const FullscreenButton = () => {
         setIsFullscreen(screenfull.isFullscreen);
         
         timeoutId = setTimeout(() => {
-          // Pengecekan ekstra: pastikan map dan container-nya masih hidup sebelum di-resize
           if (map && map.getContainer()) {
             map.invalidateSize();
           }
@@ -69,7 +72,6 @@ const FullscreenButton = () => {
       screenfull.on('change', handleFullscreenChange);
     }
 
-    // 🔥 FIX: Fungsi Cleanup agar tidak terjadi error "_leaflet_pos" saat unmount
     return () => {
       if (screenfull.isEnabled) {
         screenfull.off('change', handleFullscreenChange);
@@ -81,7 +83,6 @@ const FullscreenButton = () => {
   }, [map]);
 
   const toggleFullscreen = () => {
-    // Gunakan elemen parent terdekat sebagai patokan fullscreen
     const mapContainer = map.getContainer();
     if (screenfull.isEnabled) {
       screenfull.toggle(mapContainer.parentElement || mapContainer);
@@ -108,8 +109,14 @@ const FullscreenButton = () => {
 export default function MapInteraktif({ dataFasilitas }: { dataFasilitas: any[] }) {
   const centerPos: [number, number] = [-7.1448, 111.8711]; 
   
-  const rawCategories = dataFasilitas.map(item => item.kategori).filter(Boolean);
-  const categories = [...new Set([...rawCategories, 'Gayatri'])];
+  // 🔥 NORMALISASI DATA: Otomatis mengubah data "Gayatri" lama jadi "Unggulan_Gayatri"
+  const normalizedData = dataFasilitas.map(item => ({
+    ...item,
+    kategori: item.kategori === 'Gayatri' ? 'Unggulan_Gayatri' : item.kategori
+  }));
+
+  const rawCategories = normalizedData.map(item => item.kategori).filter(Boolean);
+  const categories = [...new Set([...rawCategories, 'Unggulan_Gayatri', 'Unggulan_Domba_Kesejahteraan'])];
   
   const [activeCategories, setActiveCategories] = useState<string[]>(categories as string[]);
 
@@ -119,7 +126,7 @@ export default function MapInteraktif({ dataFasilitas }: { dataFasilitas: any[] 
     );
   };
 
-  const filteredData = dataFasilitas.filter(item => 
+  const filteredData = normalizedData.filter(item => 
     item.kategori && activeCategories.includes(item.kategori)
   );
 
@@ -127,7 +134,6 @@ export default function MapInteraktif({ dataFasilitas }: { dataFasilitas: any[] 
     <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 bg-white p-4 rounded-3xl shadow-xl border border-navy/10 overflow-hidden">
       
       {/* SIDEBAR FILTER */}
-      {/* Tailwind warning fixed: max-h-[500px] -> max-h-125 */}
       <div className="lg:w-1/4 bg-navy text-white p-6 rounded-2xl flex flex-col h-auto lg:h-[75vh] max-h-125 lg:max-h-none overflow-y-auto custom-scrollbar shadow-inner shrink-0">
         <h3 className="font-bold text-lg mb-6 border-b border-white/20 pb-4">Filter Peta</h3>
         <div className="space-y-4">
@@ -150,8 +156,9 @@ export default function MapInteraktif({ dataFasilitas }: { dataFasilitas: any[] 
                 onChange={() => toggleCategory(kategori)}
                 className="w-5 h-5 rounded bg-white/10 border-white/30 text-accent focus:ring-accent cursor-pointer"
               />
+              {/* Teks tanpa emotikon, underscore diganti spasi */}
               <span className="group-hover:text-accent transition-colors text-sm font-medium">
-                {kategori === 'Gayatri' ? '🐔 Sektor Gayatri' : kategori.replace(/_/g, ' ')}
+                {kategori.replace(/_/g, ' ')}
               </span>
             </label>
           ))}
@@ -159,7 +166,6 @@ export default function MapInteraktif({ dataFasilitas }: { dataFasilitas: any[] 
       </div>
 
       {/* AREA PETA SATELIT */}
-      {/* Tailwind warning fixed: min-h-[500px] -> min-h-125 */}
       <div className="lg:w-3/4 h-[60vh] lg:h-[75vh] min-h-125 rounded-2xl overflow-hidden relative border-4 border-navy shadow-inner z-0">
         
         <MapContainer 
@@ -190,19 +196,19 @@ export default function MapInteraktif({ dataFasilitas }: { dataFasilitas: any[] 
               <Marker 
                 key={item.documentId || item.id} 
                 position={[lat, lng]}
-                icon={getCustomIcon(item.kategori)}
+                icon={getCustomIcon(item.kategori)} // Emotikon hanya dipanggil di fungsi ini
               >
                 <Popup className="custom-popup">
-                  {/* Tailwind warning fixed: w-[250px] -> w-62.5 */}
                   <div className="w-62.5 flex flex-col">
                     <img src={fotoUrl} alt={item.nama_fasilitas} className="w-full h-32 object-cover rounded-t-xl m-0" />
                     <div className="p-4 bg-white rounded-b-xl">
                       <h4 className="font-bold text-navy text-base mb-1 m-0 leading-tight">{item.nama_fasilitas}</h4>
+                      
+                      {/* Badge Kategori akan menampilkan teks yang bersih */}
                       <span className="inline-block bg-blue-100 text-blue-primary text-[10px] uppercase tracking-wider px-2 py-1 rounded-full mb-3 font-bold mt-2 border border-blue-primary/20">
                         {item.kategori ? item.kategori.replace(/_/g, ' ') : 'Umum'}
                       </span>
                       
-                      {/* Tailwind warning fixed: hover:!text-navy -> hover:text-navy! & !text-white -> text-white! */}
                       <Link 
                         href={`/fasilitas/${item.documentId || item.id}`} 
                         className="block w-full bg-navy hover:bg-accent hover:text-navy! text-white! text-center py-2.5 rounded-lg font-bold text-sm transition-colors no-underline shadow-md border border-transparent hover:border-navy/20"

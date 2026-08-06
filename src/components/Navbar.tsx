@@ -14,9 +14,9 @@ export default function Navbar() {
     { name: 'Berita', href: '/berita' },
     { name: 'Katalog UMKM', href: '/umkm' },
     { name: 'Infografis', href: '/infografis' },
-    { name: 'Fasilitas & Peta Potensi', href: '/fasilitas' },
+    { name: 'Fasilitas & Peta Potensi', href: '/fasilitas' }, 
     { name: 'Layanan Publik', href: '/layanan' },
-    { name: 'Galeri Desa', href: '/galeri' },
+    { name: 'Galeri Kelurahan', href: '/galeri' },
   ];
 
   return (

@@ -12,12 +12,9 @@ import OrgChart from '@/components/OrgChart';
 // Fungsi Fetcher Khusus untuk Perangkat Desa
 async function getPerangkatDesa() {
   try {
-    // Kalau di local otomatis pakai localhost:1337, kalau di Vercel otomatis pakai VPS 103.82.92.95
     const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://103.82.92.95:1337';
-    
-    // Perhatikan kita pakai perangkat-desas (huruf s) dan populate=*
     const res = await fetch(`${baseUrl}/api/perangkat-desas?populate=*&pagination[limit]=100`, {
-      cache: 'no-store'
+      cache: 'no-store' 
     });
     
     if (!res.ok) return [];
@@ -35,10 +32,7 @@ export default async function Home() {
   const profilData = await getProfilDesa();
   const infografisData = await getInfografis(); 
   
-  // Ambil Data Perangkat Desa
   const rawPerangkatDesa = await getPerangkatDesa();
-  // 🔥 PASANG CCTV PERANGKAT DESA
-  console.log("=== DATA PERANGKAT DESA ===", JSON.stringify(rawPerangkatDesa, null, 2));
 
   const totalUmkm = umkmData ? umkmData.length : 0;
   
@@ -52,7 +46,6 @@ export default async function Home() {
       ? beranda.foto_hero.data.attributes.url
       : 'https://images.pexels.com/photos/209266/pexels-photo-209266.jpeg?auto=compress&cs=tinysrgb&w=1200';
 
-  // 🔥 Fungsi Pembersih URL (Biar Vercel yang ngambilin gambarnya lewat proxy next.config.ts)
   const getCleanPath = (url: string) => {
     if (!url) return '';
     try {
@@ -63,9 +56,7 @@ export default async function Home() {
     }
   };
 
-  // 🔥 Format Data Perangkat Desa agar sesuai dengan Props di OrgChart.tsx
   const dataPerangkatDesa = rawPerangkatDesa.map((item: any) => {
-    // 1. Ambil path foto
     let fotoUrl = '';
     if (item.foto?.url) {
       fotoUrl = item.foto.url;
@@ -73,7 +64,6 @@ export default async function Home() {
       fotoUrl = item.foto.data.attributes.url;
     }
 
-    // 2. Parser Biografi (Karena formatnya Rich text / Blocks array)
     let parsedBiografi = '';
     if (Array.isArray(item.biografi)) {
       parsedBiografi = item.biografi.map((block: any) => {
@@ -132,6 +122,9 @@ export default async function Home() {
     }
   };
 
+  // 🔥 DEKLARASIKAN VARIABEL DI SINI, SEBELUM RETURN
+  const teksLokasi = beranda?.teks_lokasi_hero || "Pemerintah Kelurahan - Kecamatan Bojonegoro, Kab. Bojonegoro";
+
   return (
     <main className="min-h-screen bg-cream font-sans pb-24">
       
@@ -145,14 +138,16 @@ export default async function Home() {
             alt="Pemandangan Kelurahan Sumbang"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-navy/60 via-navy/70 to-blue-primary/90 mix-blend-multiply"></div>
+          {/* Mengikuti saran Tailwind: bg-linear-to-b */}
+          <div className="absolute inset-0 bg-linear-to-b from-navy/60 via-navy/70 to-blue-primary/90 mix-blend-multiply"></div>
         </div>
 
         {/* Konten Teks Utama */}
         <div className="relative z-10 flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full px-6 lg:px-8 pt-32 pb-12 animate-fade-up">
           
-          <p className="text-white/90 text-sm md:text-base font-medium mb-3 md:mb-5 tracking-wide">
-            Pemerintah Kelurahan - Kecamatan Bojonegoro, Kab. Bojonegoro
+          {/* 🔥 Panggil variabel teksLokasi di dalam kurung kurawal */}
+          <p className="text-sm md:text-base text-white/80 font-medium mb-4">
+            {teksLokasi}
           </p>
           
           <BlurText 
@@ -232,7 +227,8 @@ export default async function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           <div className="lg:col-span-5 relative flex justify-center">
-            <div className="relative w-full max-w-[380px] aspect-[4/5] rounded-t-[150px] rounded-b-3xl overflow-hidden shadow-2xl border-4 border-white bg-gray-100">
+            {/* Mengikuti saran Tailwind: max-w-95 aspect-4/5 */}
+            <div className="relative w-full max-w-95 aspect-4/5 rounded-t-[150px] rounded-b-3xl overflow-hidden shadow-2xl border-4 border-white bg-gray-100">
               <img 
                 src={getCleanPath(fotoLurahUrl) || fotoLurahUrl} 
                 alt={beranda?.nama_lurah || 'Foto Lurah'} 
@@ -350,7 +346,8 @@ export default async function Home() {
             <p className="text-navy/60 mt-4 max-w-2xl mx-auto">Klik pada foto perangkat kelurahan untuk melihat profil dan biografi singkat.</p>
           </div>
           
-          <div className="w-full bg-white rounded-[2rem] md:rounded-[3rem] shadow-xl shadow-navy/5 border border-navy/10 p-6">
+          {/* Mengikuti saran Tailwind: rounded-4xl */}
+          <div className="w-full bg-white rounded-4xl md:rounded-[3rem] shadow-xl shadow-navy/5 border border-navy/10 p-6">
             {/* 🔥 PANGGIL KOMPONEN ORG CHART DENGAN DATA DARI STRAPI */}
             {dataPerangkatDesa.length > 0 ? (
               <OrgChart data={dataPerangkatDesa} />
@@ -406,7 +403,8 @@ export default async function Home() {
               </div>
             </div>
 
-            <div className="bg-navy/5 rounded-[2.5rem] overflow-hidden border border-navy/10 h-[350px] lg:h-auto relative shadow-inner">
+            {/* Mengikuti saran Tailwind: h-87.5 */}
+            <div className="bg-navy/5 rounded-[2.5rem] overflow-hidden border border-navy/10 h-87.5 lg:h-auto relative shadow-inner">
               {profilData?.link_peta ? (
                 <iframe 
                   src={profilData.link_peta} 
